@@ -20,14 +20,14 @@ import org.json.JSONObject
 import java.util.*
 
 /**
- * TwoFragment で使う
+ *
  */
-class OneViewModel(
+class SearchViewModel(
     val context: Context
 ) : ViewModel() {
 
     // 検索結果
-    fun searchResults(inputText: String): List<item> = runBlocking {
+    fun searchResults(inputText: String): List<RepoInfo> = runBlocking {
         val client = HttpClient(Android)
 
         return@runBlocking GlobalScope.async {
@@ -40,7 +40,7 @@ class OneViewModel(
 
             val jsonItems = jsonBody.optJSONArray("items")!!
 
-            val items = mutableListOf<item>()
+            val resultList = mutableListOf<RepoInfo>()
 
             /**
              * アイテムの個数分ループする
@@ -55,8 +55,8 @@ class OneViewModel(
                 val forksCount = jsonItem.optLong("forks_conut")
                 val openIssuesCount = jsonItem.optLong("open_issues_count")
 
-                items.add(
-                    item(
+                resultList.add(
+                    RepoInfo(
                         name = name,
                         ownerIconUrl = ownerIconUrl,
                         language = context.getString(R.string.written_language, language),
@@ -70,13 +70,13 @@ class OneViewModel(
 
             lastSearchDate = Date()
 
-            return@async items.toList()
+            return@async resultList.toList()
         }.await()
     }
 }
 
 @Parcelize
-data class item(
+data class RepoInfo(
     val name: String,
     val ownerIconUrl: String,
     val language: String,
