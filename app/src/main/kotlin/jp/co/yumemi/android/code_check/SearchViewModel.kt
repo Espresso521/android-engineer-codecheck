@@ -22,9 +22,7 @@ import java.util.*
 /**
  *
  */
-class SearchViewModel(
-    val context: Context
-) : ViewModel() {
+class SearchViewModel : ViewModel() {
 
     // 検索結果
     fun searchResults(inputText: String): List<RepoInfo> = runBlocking {
@@ -52,14 +50,14 @@ class SearchViewModel(
                 val language = jsonItem.optString("language")
                 val stargazersCount = jsonItem.optLong("stargazers_count")
                 val watchersCount = jsonItem.optLong("watchers_count")
-                val forksCount = jsonItem.optLong("forks_conut")
+                val forksCount = jsonItem.optLong("forks")
                 val openIssuesCount = jsonItem.optLong("open_issues_count")
 
                 resultList.add(
                     RepoInfo(
                         name = name,
                         ownerIconUrl = ownerIconUrl,
-                        language = context.getString(R.string.written_language, language),
+                        language = language,
                         stargazersCount = stargazersCount,
                         watchersCount = watchersCount,
                         forksCount = forksCount,

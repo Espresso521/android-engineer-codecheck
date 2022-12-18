@@ -10,18 +10,30 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
+    private var _binding: FragmentSearchBinding? = null
+
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val binding = FragmentSearchBinding.bind(view)
-
-        val viewModel = SearchViewModel(requireContext())
+        val viewModel: SearchViewModel by viewModels()
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
@@ -37,6 +49,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 editText.text.toString().let {
                     viewModel.searchResults(it).apply {
                         adapter.submitList(this)
+                        adapter.notifyDataSetChanged();
                     }
                 }
                 return@setOnEditorActionListener true
@@ -49,6 +62,11 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             it.addItemDecoration(dividerItemDecoration)
             it.adapter = adapter
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     fun gotoRepositoryFragment(repoInfo: RepoInfo) {
