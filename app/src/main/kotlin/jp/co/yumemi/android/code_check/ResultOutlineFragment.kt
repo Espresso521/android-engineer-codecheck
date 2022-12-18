@@ -9,7 +9,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import coil.load
-import jp.co.yumemi.android.code_check.TopActivity.Companion.lastSearchDate
+import jp.co.yumemi.android.code_check.MainActivity.Companion.lastSearchDate
 import jp.co.yumemi.android.code_check.databinding.FragmentResultBinding
 
 class ResultOutlineFragment : Fragment(R.layout.fragment_result) {
