@@ -10,14 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.model.RepoInfo
+import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
@@ -83,38 +84,3 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 }
 
-val diff_util = object : DiffUtil.ItemCallback<RepoInfo>() {
-    override fun areItemsTheSame(oldItem: RepoInfo, newItem: RepoInfo): Boolean {
-        return oldItem.name == newItem.name
-    }
-
-    override fun areContentsTheSame(oldItem: RepoInfo, newItem: RepoInfo): Boolean {
-        return oldItem == newItem
-    }
-
-}
-
-class ResultListAdapter(
-    private val itemClickListener: OnItemClickListener,
-) : ListAdapter<RepoInfo, ResultListAdapter.ViewHolder>(diff_util) {
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-    interface OnItemClickListener {
-        fun itemClick(RepoInfo: RepoInfo)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.layout_item, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        (holder.itemView.findViewById<View>(R.id.repositoryNameView) as TextView).text = item.name
-
-        holder.itemView.setOnClickListener {
-            itemClickListener.itemClick(item)
-        }
-    }
-}
