@@ -4,6 +4,7 @@
 package jp.co.yumemi.android.code_check.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -20,14 +21,16 @@ import org.json.JSONObject
 import java.util.*
 
 /**
- * Do repositories search option for [SearchFragment]
+ * ViewModel for [jp.co.yumemi.android.code_check.ui.SearchFragment]
  */
 class SearchViewModel : ViewModel() {
+
+    var searchResults: MutableLiveData<List<RepoInfo>> = MutableLiveData(listOf())
 
     /**
      * Search repositories for keyWord, return list of [RepoInfo]
      */
-    fun searchResults(keyWord: String): List<RepoInfo> = runBlocking {
+    fun searchResults(keyWord: String) : Boolean = runBlocking {
         val client = HttpClient(Android) {
             install(ResponseObserver) {
                 /**
@@ -53,7 +56,7 @@ class SearchViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.e("SearchViewModel", e.toString())
-                return@async resultList.toList()
+                return@async false
             } finally {
                 client.close()
             }
@@ -88,8 +91,8 @@ class SearchViewModel : ViewModel() {
             }
 
             lastSearchDate = Date()
-
-            return@async resultList.toList()
+            searchResults.postValue(resultList.toList())
+            return@async resultList.size != 0
         }.await()
     }
 }

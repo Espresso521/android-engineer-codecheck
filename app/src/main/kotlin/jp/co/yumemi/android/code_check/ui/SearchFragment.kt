@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -27,37 +28,37 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private val binding get() = _binding!!
 
+    private val searchViewModel: SearchViewModel by viewModels()
+
+    private lateinit var adapter: ResultListAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
 
+        adapter = ResultListAdapter(object : ResultListAdapter.OnItemClickListener {
+            override fun itemClick(RepoInfo: RepoInfo) {
+                gotoRepositoryFragment(RepoInfo)
+            }
+        })
+
+        searchViewModel.searchResults.observe(viewLifecycleOwner) { searchResults ->
+            adapter.submitList(searchResults)
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: SearchViewModel by viewModels()
-
-        val layoutManager = LinearLayoutManager(requireContext())
-        val dividerItemDecoration =
-            DividerItemDecoration(requireContext(), layoutManager.orientation)
-        val adapter = ResultListAdapter(object : ResultListAdapter.OnItemClickListener {
-            override fun itemClick(item: RepoInfo) {
-                gotoRepositoryFragment(item)
-            }
-        })
-
         binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) {
-                editText.text.toString().let {
-                    viewModel.searchResults(it).apply {
-                        adapter.submitList(this)
-                        adapter.notifyDataSetChanged();
-                        val imm = view.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                        imm.hideSoftInputFromWindow(view.windowToken, 0)
+                editText.text.toString().let { keyword ->
+                    searchViewModel.searchResults(keyword).let { ret ->
+                        hideSoftInput(view)
+                        if(!ret) toast("No result. Try again")
                     }
                 }
                 return@setOnEditorActionListener true
@@ -65,9 +66,14 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             return@setOnEditorActionListener false
         }
 
-        binding.recyclerView.also {
-            it.layoutManager = layoutManager
-            it.addItemDecoration(dividerItemDecoration)
+        binding.recyclerView.let {
+            it.layoutManager = LinearLayoutManager(requireContext())
+            it.addItemDecoration(
+                DividerItemDecoration(
+                    requireContext(),
+                    DividerItemDecoration.HORIZONTAL
+                )
+            )
             it.adapter = adapter
         }
     }
@@ -82,5 +88,21 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment(repoInfo = repoInfo)
         findNavController().navigate(directions)
     }
+
+    private fun hideSoftInput(view: View) {
+        (view.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+            view.windowToken,
+            0
+        )
+    }
+
+    private fun toast(content: String) {
+        Toast.makeText(
+            context,
+            content,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 }
+
 
