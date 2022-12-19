@@ -3,17 +3,20 @@
  */
 package jp.co.yumemi.android.code_check
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
+import jp.co.yumemi.android.code_check.model.RepoInfo
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
@@ -50,6 +53,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                     viewModel.searchResults(it).apply {
                         adapter.submitList(this)
                         adapter.notifyDataSetChanged();
+                        val imm = view.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(view.windowToken, 0)
                     }
                 }
                 return@setOnEditorActionListener true
