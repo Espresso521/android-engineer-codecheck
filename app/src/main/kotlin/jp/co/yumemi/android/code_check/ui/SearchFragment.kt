@@ -14,7 +14,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.RepoInfo
@@ -68,12 +67,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
         binding.recyclerView.let {
             it.layoutManager = LinearLayoutManager(requireContext())
-            it.addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    DividerItemDecoration.HORIZONTAL
-                )
-            )
             it.adapter = adapter
         }
     }
