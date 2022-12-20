@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="jp.co.yumemi.android.code_check.model.BindingAdapters"/>
+        <import type="jp.co.yumemi.android.code_check.ui.adapter.BindingAdapters"/>
         <variable
             name="repoInfo"
-            type="jp.co.yumemi.android.code_check.model.RepoInfo" />
+            type="jp.co.yumemi.android.code_check.data.RepoInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:text='@{"Written in " + repoInfo.language}'
+            android:text="@{@string/written_language(repoInfo.language)}"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintTop_toBottomOf="@id/nameView"

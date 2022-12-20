@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
-import jp.co.yumemi.android.code_check.model.RepoInfo
+import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 
@@ -56,10 +56,10 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) {
                 editText.text.toString().let { keyword ->
-                    searchViewModel.searchResults(keyword).let { ret ->
-                        hideSoftInput(view)
-                        if(!ret) toast("No result. Try again")
+                    if (keyword.isNotEmpty()) {
+                        searchViewModel.doSearch(keyword)
                     }
+                    hideSoftInput(view)
                 }
                 return@setOnEditorActionListener true
             }
@@ -96,13 +96,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         )
     }
 
-    private fun toast(content: String) {
-        Toast.makeText(
-            context,
-            content,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
 }
 
 
