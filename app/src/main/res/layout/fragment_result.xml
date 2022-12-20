@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="jp.co.yumemi.android.code_check.ui.adapter.BindingAdapters"/>
+
+        <import type="jp.co.yumemi.android.code_check.ui.adapter.BindingAdapters" />
+
         <variable
             name="repoInfo"
             type="jp.co.yumemi.android.code_check.data.RepoInfo" />
@@ -32,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@{repoInfo.name}"
+            android:text="@{repoInfo.name, default=@string/app_name}"
             android:textColor="@color/black"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:text="@{@string/written_language(repoInfo.language)}"
+            android:text="@{@string/written_language(repoInfo.language), default=@string/written_language}"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintTop_toBottomOf="@id/nameView"
@@ -64,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:text='@{repoInfo.stargazersCount + " starts"}'
+            android:text='@{repoInfo.stargazersCount + " starts", default="123 starts"}'
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="12sp"
@@ -78,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:text='@{repoInfo.watchersCount + " watchers"}'
+            android:text='@{repoInfo.watchersCount + " watchers", default="456 watchers"}'
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="12sp"
@@ -92,12 +94,12 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:text='@{repoInfo.forksCount + " forks"}'
+            android:text='@{repoInfo.forksCount + " forks", default="789 forks"}'
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toLeftOf="@id/centerGuid"
+            app:layout_constraintStart_toStartOf="@id/centerGuid"
             app:layout_constraintTop_toBottomOf="@id/watchersView" />
 
         <TextView
@@ -106,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:text='@{repoInfo.openIssuesCount + " open issues"}'
+            android:text='@{repoInfo.openIssuesCount + " open issues", default="1234 open issues"}'
             android:textAlignment="textEnd"
             android:textColor="@color/black"
             android:textSize="12sp"

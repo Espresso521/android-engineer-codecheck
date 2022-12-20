@@ -40,7 +40,7 @@ class SearchResultRepository {
     suspend fun doSearch(keyWord: String): Result<List<RepoInfo>> = runCatching {
         val resultList = mutableListOf<RepoInfo>()
 
-        var response: HttpResponse = client.get("https://api.github.com/search/repositories") {
+        val response: HttpResponse = client.get("https://api.github.com/search/repositories") {
             header("Accept", "application/vnd.github.v3+json")
             parameter("q", keyWord)
         }
@@ -49,20 +49,26 @@ class SearchResultRepository {
             jsonObject.optJSONArray("items")?.let { JSONArray ->
                 for (i in 0 until JSONArray.length()) {
                     JSONArray.optJSONObject(i)?.let { jsonItem ->
-                        val name = jsonItem.optString("full_name")
+                        val fullName = jsonItem.optString("full_name")
+                        val name = jsonItem.optString("name")
                         val ownerIconUrl =
                             jsonItem.optJSONObject("owner")?.optString("avatar_url") ?: ""
+                        val loginName = jsonItem.optJSONObject("owner")?.optString("login") ?: ""
                         val language = jsonItem.optString("language")
                         val stargazersCount = jsonItem.optLong("stargazers_count")
                         val watchersCount = jsonItem.optLong("watchers_count")
                         val forksCount = jsonItem.optLong("forks")
                         val openIssuesCount = jsonItem.optLong("open_issues_count")
+                        val description = jsonItem.optString("description")
 
                         resultList.add(
                             RepoInfo(
                                 name = name,
+                                fullName = fullName,
+                                loginName = loginName,
                                 ownerIconUrl = ownerIconUrl,
                                 language = language,
+                                description = description,
                                 stargazersCount = stargazersCount,
                                 watchersCount = watchersCount,
                                 forksCount = forksCount,

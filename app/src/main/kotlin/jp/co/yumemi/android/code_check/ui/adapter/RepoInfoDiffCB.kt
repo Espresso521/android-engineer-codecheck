@@ -5,10 +5,10 @@ import jp.co.yumemi.android.code_check.data.RepoInfo
 
 class RepoInfoDiffCB : DiffUtil.ItemCallback<RepoInfo>() {
     override fun areItemsTheSame(oldItem: RepoInfo, newItem: RepoInfo): Boolean {
-        return oldItem.name == newItem.name
+        return oldItem.fullName == newItem.fullName
     }
 
     override fun areContentsTheSame(oldItem: RepoInfo, newItem: RepoInfo): Boolean {
-        return oldItem == newItem
+        return oldItem.fullName == newItem.fullName
     }
 }

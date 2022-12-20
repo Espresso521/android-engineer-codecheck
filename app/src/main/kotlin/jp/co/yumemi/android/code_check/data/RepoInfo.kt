@@ -9,8 +9,11 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class RepoInfo(
     val name: String,
+    val fullName: String,
+    val loginName: String,
     val ownerIconUrl: String,
     val language: String,
+    var description: String,
     val stargazersCount: Long,
     val watchersCount: Long,
     val forksCount: Long,

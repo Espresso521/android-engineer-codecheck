@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="jp.co.yumemi.android.code_check.ui.adapter.BindingAdapters" />
+
+        <variable
+            name="repoInfo"
+            type="jp.co.yumemi.android.code_check.data.RepoInfo" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/icon_name_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ownerIconView"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:avatar="@{repoInfo.ownerIconUrl}"
+                android:contentDescription="@null"
+                android:src="@drawable/jetbrains"
+                app:layout_constraintDimensionRatio="1:1" />
+
+            <TextView
+                android:id="@+id/nameView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:text="@{repoInfo.loginName, default=@string/app_name}"
+                android:textSize="12sp"
+                android:textColor="@color/gray" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <TextView
+            android:id="@+id/repositoryName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@{repoInfo.name, default=Java}"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="@id/icon_name_layout"
+            app:layout_constraintTop_toBottomOf="@id/icon_name_layout"
+            tools:text="Java" />
+
+        <TextView
+            android:id="@+id/repositoryDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="2dp"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:text="@{repoInfo.description}"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="@id/icon_name_layout"
+            app:layout_constraintTop_toBottomOf="@id/repositoryName"
+            tools:text="存放JAVA开发的设计思想、算法：《剑指Offer》、《编程珠玑》、《深入理解Java虚拟机：JVM高级特性与最佳实践》、《重构-改善既有代码的设计 中文版》、《clean_code(中文完整版)》、《Java编程思想(第4版)》、《Java核心技术 卷I (第8版)》、《Quartz_Job+Scheduling_Framework》；一些大的上传不上来的文件在README" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/star_language_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/icon_name_layout"
+            app:layout_constraintTop_toBottomOf="@id/repositoryDescription">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@null"
+                android:src="@mipmap/star"
+                app:layout_constraintDimensionRatio="1:1" />
+
+            <TextView
+                android:id="@+id/starNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="3dp"
+                android:text="@{String.valueOf(repoInfo.stargazersCount), default=456789}"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/gray"/>
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@null"
+                android:layout_marginStart="15dp"
+                android:src="@mipmap/circle"
+                app:layout_constraintDimensionRatio="1:1" />
+
+            <TextView
+                android:id="@+id/languageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="3dp"
+                android:text="@{repoInfo.language ?? repoInfo.name}"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/gray"
+                tools:text="Java" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dimGray"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintTop_toBottomOf="@id/star_language_layout"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

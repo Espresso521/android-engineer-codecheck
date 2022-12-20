@@ -38,7 +38,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        adapter = ResultListAdapter(object : ResultListAdapter.OnItemClickListener {
+        adapter = ResultListAdapter(viewLifecycleOwner, object : ResultListAdapter.OnItemClickListener {
             override fun itemClick(RepoInfo: RepoInfo) {
                 gotoRepositoryFragment(RepoInfo)
             }
