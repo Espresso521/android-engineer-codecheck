@@ -4,35 +4,32 @@
 package jp.co.yumemi.android.code_check.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
-import jp.co.yumemi.android.code_check.MainActivity.Companion.lastSearchDate
+import androidx.fragment.app.activityViewModels
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.databinding.FragmentResultBinding
+import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 
 class ResultOutlineFragment : Fragment(R.layout.fragment_result) {
-
-    private val args: ResultOutlineFragmentArgs by navArgs()
 
     private var _binding: FragmentResultBinding? = null
 
     private val binding get() = _binding!!
 
+    private val searchViewModel: SearchViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentResultBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d("検索した日時", lastSearchDate.toString())
-        binding.repoInfo = args.repoInfo;
+        searchViewModel.selectedResults.observe(viewLifecycleOwner) {
+            binding.repoInfo = it
+        }
+        return binding.root
     }
 
     override fun onDestroyView() {

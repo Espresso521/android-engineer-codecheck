@@ -23,6 +23,10 @@ class SearchViewModel : ViewModel() {
 
     val searchResults: LiveData<List<RepoInfo>> = _searchResults
 
+    private var _selectedResults: MutableLiveData<RepoInfo> = MutableLiveData()
+
+    val selectedResults: LiveData<RepoInfo> = _selectedResults
+
     fun doSearch(keyWord: String) {
         viewModelScope.launch {
             searchResultRepository.doSearch(keyWord).let { result ->
@@ -36,6 +40,10 @@ class SearchViewModel : ViewModel() {
                 )
             }
         }
+    }
+
+    fun setSelectedItem(repoInfo: RepoInfo) {
+        _selectedResults.value = repoInfo
     }
 
 }

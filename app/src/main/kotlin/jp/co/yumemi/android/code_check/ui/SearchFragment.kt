@@ -4,21 +4,21 @@
 package jp.co.yumemi.android.code_check.ui
 
 import android.content.Context
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.data.RepoInfo
+import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 
@@ -28,7 +28,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private val binding get() = _binding!!
 
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     private lateinit var adapter: ResultListAdapter
 
@@ -84,9 +84,14 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     fun gotoRepositoryFragment(repoInfo: RepoInfo) {
-        val directions =
-            SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment(repoInfo = repoInfo)
-        findNavController().navigate(directions)
+        searchViewModel.setSelectedItem(repoInfo)
+        if (resources.configuration.orientation == ORIENTATION_PORTRAIT) {
+            findNavController().navigate(
+                SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment(
+                    repoInfo = repoInfo
+                )
+            )
+        }
     }
 
     private fun hideSoftInput(view: View) {
