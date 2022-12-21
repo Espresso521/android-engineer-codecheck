@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -33,10 +34,12 @@
             android:id="@+id/nameView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
+            android:layout_marginStart="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="@{repoInfo.loginName, default=@string/app_name}"
             android:textColor="@color/gray"
-            android:textSize="18sp"
+            android:textSize="21sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/centerGuid"
             app:layout_constraintTop_toTopOf="@+id/ownerIconView" />
@@ -63,120 +66,31 @@
             app:layout_constraintTop_toBottomOf="@+id/ownerIconView"
             tools:ignore="MissingConstraints" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/info_layout"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_marginTop="2dp"
-            app:layout_constraintBottom_toBottomOf="@+id/ownerIconView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/centerGuid"
-            app:layout_constraintTop_toBottomOf="@+id/nameView">
+        <include layout="@layout/repo_base_info_layout"
+            bind:repoInfo="@{repoInfo}"/>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center|start"
-                android:paddingHorizontal="16dp">
+        <View
+            android:id="@+id/description_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/lightGray"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintTop_toBottomOf="@id/languageView"/>
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/star_gray"
-                    app:layout_constraintDimensionRatio="1:1" />
-
-                <TextView
-                    android:id="@+id/starsView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:gravity="bottom"
-                    android:text='@{repoInfo.stargazersCount + " Start", default="123 Star"}'
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center|start"
-                android:paddingHorizontal="16dp">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/eye"
-                    app:layout_constraintDimensionRatio="1:1" />
-
-                <TextView
-                    android:id="@+id/watchersView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:gravity="bottom"
-                    android:text='@{repoInfo.watchersCount + " Watch", default="456 Watch"}'
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center|start"
-                android:paddingHorizontal="16dp">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/code_fork"
-                    app:layout_constraintDimensionRatio="1:1" />
-
-                <TextView
-                    android:id="@+id/forksView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:gravity="bottom"
-                    android:text='@{repoInfo.forksCount + " Fork", default="789 Fork"}'
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center|start"
-                android:paddingHorizontal="16dp">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/issue_opened"
-                    app:layout_constraintDimensionRatio="1:1" />
-
-                <TextView
-                    android:id="@+id/openIssuesView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:gravity="bottom"
-                    android:text='@{repoInfo.openIssuesCount + " Issues", default="1234 Issues"}'
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <TextView
+            android:id="@+id/repositoryDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:layout_marginHorizontal="10dp"
+            android:text="@{repoInfo.description}"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="@id/ownerIconView"
+            app:layout_constraintTop_toBottomOf="@id/description_divider"
+            tools:text="存放JAVA开发的设计思想、算法：《剑指Offer》、《编程珠玑》、《深入理解Java虚拟机：JVM高级特性与最佳实践》、《重构-改善既有代码的设计 中文版》、《clean_code(中文完整版)》、《Java编程思想(第4版)》、《Java核心技术 卷I (第8版)》、《Quartz_Job+Scheduling_Framework》；一些大的上传不上来的文件在README" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
