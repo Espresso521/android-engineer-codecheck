@@ -3,6 +3,7 @@
  */
 package jp.co.yumemi.android.code_check.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,12 +21,13 @@ class SearchViewModel : ViewModel() {
         SearchResultRepository.getInstance()
 
     private var _searchResults: MutableLiveData<List<RepoInfo>> = MutableLiveData(listOf())
-
     val searchResults: LiveData<List<RepoInfo>> = _searchResults
 
     private var _selectedResults: MutableLiveData<RepoInfo> = MutableLiveData()
-
     val selectedResults: LiveData<RepoInfo> = _selectedResults
+
+    private var _readMe: MutableLiveData<String> = MutableLiveData();
+    val readMe: LiveData<String> = _readMe
 
     fun doSearch(keyWord: String) {
         viewModelScope.launch {
@@ -44,6 +46,24 @@ class SearchViewModel : ViewModel() {
 
     fun setSelectedItem(repoInfo: RepoInfo) {
         _selectedResults.value = repoInfo
+    }
+
+    fun getReadMe() {
+        selectedResults.value?.fullName?.let { fullName ->
+            viewModelScope.launch {
+                searchResultRepository.getReadMe(fullName).let { result ->
+                    result.fold(
+                        onSuccess = {
+                            Log.e("SearchViewModel", "getReadMe onSuccess: $it")
+                            _readMe.value = it
+                        },
+                        onFailure = {
+                            it.printStackTrace()
+                        }
+                    )
+                }
+            }
+        }
     }
 
 }

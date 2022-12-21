@@ -60,6 +60,7 @@ class SearchResultRepository {
                         val forksCount = jsonItem.optLong("forks")
                         val openIssuesCount = jsonItem.optLong("open_issues_count")
                         val description = jsonItem.optString("description")
+                        val apiUrl = jsonItem.optString("url")
 
                         resultList.add(
                             RepoInfo(
@@ -81,6 +82,19 @@ class SearchResultRepository {
         }
         MainActivity.lastSearchDate = Date()
         return@runCatching resultList
+    }.onFailure {
+        Log.e("SearchResultRepository", "Exception: ${it.stackTraceToString()}")
+    }
+
+    //https://raw.githubusercontent.com/singgel/JAVA/master/README.md
+    suspend fun getReadMe(fullName: String): Result<String> = kotlin.runCatching {
+        val response: HttpResponse = client.get("https://raw.githubusercontent.com/" + fullName + "/master/README.md") {
+            header("Accept", "application/vnd.github.v3+json")
+        }
+
+        response.receive<String>().let {
+            return@runCatching it
+        }
     }.onFailure {
         Log.e("SearchResultRepository", "Exception: ${it.stackTraceToString()}")
     }
