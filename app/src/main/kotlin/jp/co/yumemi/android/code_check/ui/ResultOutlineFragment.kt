@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import io.noties.markwon.Markwon
@@ -31,6 +32,8 @@ class ResultOutlineFragment : Fragment(R.layout.fragment_result) {
 
         searchViewModel.selectedResults.observe(viewLifecycleOwner) {
             binding.repoInfo = it
+            binding.resultScrollView.fullScroll(ScrollView.FOCUS_UP)
+            searchViewModel.getReadMe()
         }
 
         searchViewModel.readMe.observe(viewLifecycleOwner) {
@@ -41,7 +44,6 @@ class ResultOutlineFragment : Fragment(R.layout.fragment_result) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        searchViewModel.getReadMe()
         // obtain an instance of Markwon
         markdown = context?.let { Markwon.create(it.applicationContext) }!!;
     }

@@ -60,7 +60,7 @@ class SearchResultRepository {
                         val forksCount = jsonItem.optLong("forks")
                         val openIssuesCount = jsonItem.optLong("open_issues_count")
                         val description = jsonItem.optString("description")
-                        val apiUrl = jsonItem.optString("url")
+                        val createdTime = jsonItem.optString("created_at")
 
                         resultList.add(
                             RepoInfo(
@@ -73,7 +73,8 @@ class SearchResultRepository {
                                 stargazersCount = stargazersCount,
                                 watchersCount = watchersCount,
                                 forksCount = forksCount,
-                                openIssuesCount = openIssuesCount
+                                openIssuesCount = openIssuesCount,
+                                createdTime = createdTime
                             )
                         )
                     }

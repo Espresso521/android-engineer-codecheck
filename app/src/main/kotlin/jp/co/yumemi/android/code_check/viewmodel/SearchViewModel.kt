@@ -45,7 +45,9 @@ class SearchViewModel : ViewModel() {
     }
 
     fun setSelectedItem(repoInfo: RepoInfo) {
-        _selectedResults.value = repoInfo
+        if (_selectedResults.value?.fullName != repoInfo.fullName) {
+            _selectedResults.value = repoInfo
+        }
     }
 
     fun getReadMe() {
@@ -54,11 +56,10 @@ class SearchViewModel : ViewModel() {
                 searchResultRepository.getReadMe(fullName).let { result ->
                     result.fold(
                         onSuccess = {
-                            Log.e("SearchViewModel", "getReadMe onSuccess: $it")
                             _readMe.value = it
                         },
                         onFailure = {
-                            it.printStackTrace()
+                            _readMe.value = "No README.md"
                         }
                     )
                 }

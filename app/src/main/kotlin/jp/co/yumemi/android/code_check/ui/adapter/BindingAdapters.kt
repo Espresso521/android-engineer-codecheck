@@ -9,6 +9,6 @@ object BindingAdapters {
     @BindingAdapter("avatar")
     @JvmStatic
     fun loadImage(view: ImageView, url:String?){
-        url?.let { view.load(it) } ?: view.load(R.drawable.jetbrains)
+        url?.let { view.load(it) } ?: view.load(R.mipmap.github_icon)
     }
 }

@@ -13,96 +13,157 @@
             type="jp.co.yumemi.android.code_check.data.RepoInfo" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/result_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/ownerIconView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="10dp"
-            android:contentDescription="@null"
-            app:avatar="@{repoInfo.ownerIconUrl}"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@id/centerGuid"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="240dp" />
-
-        <TextView
-            android:id="@+id/nameView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:text="@{repoInfo.loginName, default=@string/app_name}"
-            android:textColor="@color/gray"
-            android:textSize="21sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/centerGuid"
-            app:layout_constraintTop_toTopOf="@+id/ownerIconView" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/centerGuid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
-
-        <TextView
-            android:id="@+id/languageView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="3dp"
-            android:text="@{@string/written_language(repoInfo.language), default=@string/written_language}"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@+id/ownerIconView"
-            app:layout_constraintStart_toStartOf="@+id/ownerIconView"
-            app:layout_constraintTop_toBottomOf="@+id/ownerIconView"
-            tools:ignore="MissingConstraints" />
-
-        <include layout="@layout/repo_base_info_layout"
-            bind:repoInfo="@{repoInfo}"/>
-
-        <View
-            android:id="@+id/description_divider"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/lightGray"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintTop_toBottomOf="@id/languageView"/>
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/repositoryDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="5dp"
-            android:layout_marginHorizontal="10dp"
-            android:text="@{repoInfo.description}"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="@id/ownerIconView"
-            app:layout_constraintTop_toBottomOf="@id/description_divider"
-            tools:text="存放JAVA开发的设计思想、算法：《剑指Offer》、《编程珠玑》、《深入理解Java虚拟机：JVM高级特性与最佳实践》、《重构-改善既有代码的设计 中文版》、《clean_code(中文完整版)》、《Java编程思想(第4版)》、《Java核心技术 卷I (第8版)》、《Quartz_Job+Scheduling_Framework》；一些大的上传不上来的文件在README" />
+            <ImageView
+                android:id="@+id/ownerIconView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="10dp"
+                android:contentDescription="@null"
+                app:avatar="@{repoInfo.ownerIconUrl}"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toStartOf="@id/centerGuid"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="240dp" />
+
+            <TextView
+                android:id="@+id/nameView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="1dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{repoInfo.loginName, default=@string/app_name}"
+                android:textColor="@color/gray"
+                android:textSize="21sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/centerGuid"
+                app:layout_constraintTop_toTopOf="@+id/ownerIconView" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <TextView
+                android:id="@+id/languageView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="3dp"
+                android:text="@{@string/written_language(repoInfo.language), default=@string/written_language}"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/ownerIconView"
+                app:layout_constraintStart_toStartOf="@+id/ownerIconView"
+                app:layout_constraintTop_toBottomOf="@+id/ownerIconView"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/createdTimeView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text='@{@string/created_time(repoInfo.createdTime), default="Create at 2017-08-03T01:24:34Z"}'
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/languageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/nameView"
+                tools:ignore="MissingConstraints" />
+
+            <include layout="@layout/repo_base_info_layout"
+                bind:repoInfo="@{repoInfo}"/>
+
+            <View
+                android:id="@+id/description_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/lightGray"
+                app:layout_constraintTop_toBottomOf="@id/languageView" />
 
 
-        <TextView
-            android:id="@+id/readme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="5dp"
-            android:layout_marginHorizontal="10dp"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="@id/repositoryDescription"
-            app:layout_constraintTop_toBottomOf="@id/repositoryDescription"
-            tools:text="mark down"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/repositoryDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginVertical="5dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@{repoInfo.description}"
+                android:textColor="@color/black"
+                android:textSize="21sp"
+                app:layout_constraintStart_toStartOf="@id/ownerIconView"
+                app:layout_constraintTop_toBottomOf="@id/description_divider"
+                tools:text="存放JAVA开发的设计思想、算法：《剑指Offer》、《编程珠玑》、《深入理解Java虚拟机：JVM高级特性与最佳实践》、《重构-改善既有代码的设计 中文版》、《clean_code(中文完整版)》、《Java编程思想(第4版)》、《Java核心技术 卷I (第8版)》、《Quartz_Job+Scheduling_Framework》；一些大的上传不上来的文件在README" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/readme_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:paddingHorizontal="16dp"
+                app:layout_constraintStart_toStartOf="@id/repositoryDescription"
+                app:layout_constraintTop_toBottomOf="@id/repositoryDescription">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/markdownicon"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <TextView
+                    android:id="@+id/forksView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="README.md"
+                    android:textColor="@color/skyBlue"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/readme_bg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="10dp"
+                android:background="@color/whiteSmoke"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="8dp"
+                app:layout_constraintStart_toStartOf="@id/readme_title"
+                app:layout_constraintTop_toBottomOf="@id/readme_title">
+
+                <TextView
+                    android:id="@+id/readme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="15dp"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
 </layout>
