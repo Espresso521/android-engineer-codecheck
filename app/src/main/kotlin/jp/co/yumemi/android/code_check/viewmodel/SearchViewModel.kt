@@ -3,7 +3,6 @@
  */
 package jp.co.yumemi.android.code_check.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,7 +25,7 @@ class SearchViewModel : ViewModel() {
     private var _selectedResults: MutableLiveData<RepoInfo> = MutableLiveData()
     val selectedResults: LiveData<RepoInfo> = _selectedResults
 
-    private var _readMe: MutableLiveData<String> = MutableLiveData();
+    private var _readMe: MutableLiveData<String> = MutableLiveData()
     val readMe: LiveData<String> = _readMe
 
     fun doSearch(keyWord: String) {

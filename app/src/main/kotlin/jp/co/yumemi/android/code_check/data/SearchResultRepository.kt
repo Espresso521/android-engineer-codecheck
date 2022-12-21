@@ -89,7 +89,7 @@ class SearchResultRepository {
 
     //https://raw.githubusercontent.com/singgel/JAVA/master/README.md
     suspend fun getReadMe(fullName: String): Result<String> = kotlin.runCatching {
-        val response: HttpResponse = client.get("https://raw.githubusercontent.com/" + fullName + "/master/README.md") {
+        val response: HttpResponse = client.get("https://raw.githubusercontent.com/$fullName/master/README.md") {
             header("Accept", "application/vnd.github.v3+json")
         }
 

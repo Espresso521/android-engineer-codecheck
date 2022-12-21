@@ -45,7 +45,7 @@ class ResultOutlineFragment : Fragment(R.layout.fragment_result) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // obtain an instance of Markwon
-        markdown = context?.let { Markwon.create(it.applicationContext) }!!;
+        markdown = context?.let { Markwon.create(it.applicationContext) }!!
     }
 
     override fun onDestroyView() {
