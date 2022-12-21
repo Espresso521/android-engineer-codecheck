@@ -20,26 +20,26 @@
             android:id="@+id/ownerIconView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="16dp"
+            android:layout_margin="10dp"
             android:contentDescription="@null"
             app:avatar="@{repoInfo.ownerIconUrl}"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/centerGuid"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="240dp" />
 
         <TextView
             android:id="@+id/nameView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@{repoInfo.name, default=@string/app_name}"
-            android:textColor="@color/black"
+            android:layout_marginHorizontal="16dp"
+            android:text="@{repoInfo.loginName, default=@string/app_name}"
+            android:textColor="@color/gray"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ownerIconView" />
+            app:layout_constraintStart_toStartOf="@id/centerGuid"
+            app:layout_constraintTop_toTopOf="@+id/ownerIconView" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/centerGuid"
@@ -53,68 +53,130 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="3dp"
             android:text="@{@string/written_language(repoInfo.language), default=@string/written_language}"
+            android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/nameView"
+            app:layout_constraintEnd_toEndOf="@+id/ownerIconView"
+            app:layout_constraintStart_toStartOf="@+id/ownerIconView"
+            app:layout_constraintTop_toBottomOf="@+id/ownerIconView"
             tools:ignore="MissingConstraints" />
 
-        <TextView
-            android:id="@+id/starsView"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/info_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:text='@{repoInfo.stargazersCount + " starts", default="123 starts"}'
-            android:textAlignment="textEnd"
-            android:textColor="@color/black"
-            android:textSize="12sp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_marginTop="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ownerIconView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/centerGuid"
-            app:layout_constraintTop_toBottomOf="@id/nameView" />
+            app:layout_constraintTop_toBottomOf="@+id/nameView">
 
-        <TextView
-            android:id="@+id/watchersView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:text='@{repoInfo.watchersCount + " watchers", default="456 watchers"}'
-            android:textAlignment="textEnd"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/centerGuid"
-            app:layout_constraintTop_toBottomOf="@id/starsView" />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:paddingHorizontal="16dp">
 
-        <TextView
-            android:id="@+id/forksView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:text='@{repoInfo.forksCount + " forks", default="789 forks"}'
-            android:textAlignment="textEnd"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/centerGuid"
-            app:layout_constraintTop_toBottomOf="@id/watchersView" />
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/star_gray"
+                    app:layout_constraintDimensionRatio="1:1" />
 
-        <TextView
-            android:id="@+id/openIssuesView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:text='@{repoInfo.openIssuesCount + " open issues", default="1234 open issues"}'
-            android:textAlignment="textEnd"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/centerGuid"
-            app:layout_constraintTop_toBottomOf="@id/forksView" />
+                <TextView
+                    android:id="@+id/starsView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="bottom"
+                    android:text='@{repoInfo.stargazersCount + " Start", default="123 Star"}'
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/eye"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <TextView
+                    android:id="@+id/watchersView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="bottom"
+                    android:text='@{repoInfo.watchersCount + " Watch", default="456 Watch"}'
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/code_fork"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <TextView
+                    android:id="@+id/forksView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="bottom"
+                    android:text='@{repoInfo.forksCount + " Fork", default="789 Fork"}'
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/issue_opened"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <TextView
+                    android:id="@+id/openIssuesView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="bottom"
+                    android:text='@{repoInfo.openIssuesCount + " Issues", default="1234 Issues"}'
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
