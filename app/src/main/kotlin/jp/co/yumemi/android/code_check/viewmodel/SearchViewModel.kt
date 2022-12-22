@@ -46,10 +46,11 @@ class SearchViewModel : ViewModel() {
     fun setSelectedItem(repoInfo: RepoInfo) {
         if (_selectedResults.value?.fullName != repoInfo.fullName) {
             _selectedResults.value = repoInfo
+            getReadMe()
         }
     }
 
-    fun getReadMe() {
+    private fun getReadMe() {
         selectedResults.value?.fullName?.let { fullName ->
             viewModelScope.launch {
                 searchResultRepository.getReadMe(fullName).let { result ->
@@ -64,6 +65,11 @@ class SearchViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        searchResultRepository.close()
     }
 
 }

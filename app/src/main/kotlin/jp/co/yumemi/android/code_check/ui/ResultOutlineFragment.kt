@@ -33,7 +33,6 @@ class ResultOutlineFragment : Fragment(R.layout.fragment_result) {
         searchViewModel.selectedResults.observe(viewLifecycleOwner) {
             binding.repoInfo = it
             binding.resultScrollView.fullScroll(ScrollView.FOCUS_UP)
-            searchViewModel.getReadMe()
         }
 
         searchViewModel.readMe.observe(viewLifecycleOwner) {
