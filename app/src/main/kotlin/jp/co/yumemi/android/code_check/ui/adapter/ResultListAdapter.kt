@@ -7,11 +7,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.RepoInfoViewBinding
+import jp.co.yumemi.android.code_check.databinding.RepoLoadingBinding
 
 class ResultListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val itemClickListener: OnItemClickListener,
-) : ListAdapter<RepoInfo, ResultListAdapter.RepoInfoViewHolder>(RepoInfoDiffCB()) {
+) : ListAdapter<RepoInfo, RecyclerView.ViewHolder>(RepoInfoDiffCB()) {
+
+    private val VIEW_TYPE_ITEM = 0
+    private val VIEW_TYPE_LOADING = 1
 
     class RepoInfoViewHolder(private val binding: RepoInfoViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -24,11 +28,38 @@ class ResultListAdapter(
         }
     }
 
+    private class LoadingViewHolder(binding: RepoLoadingBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var progressBar  = binding.loadProgressBar
+    }
+
     interface OnItemClickListener {
         fun itemClick(RepoInfo: RepoInfo)
     }
 
-    override fun onBindViewHolder(holder: RepoInfoViewHolder, position: Int) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        if (viewType == VIEW_TYPE_ITEM) {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            return RepoInfoViewHolder(RepoInfoViewBinding.inflate(layoutInflater, parent, false))
+        } else {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            return LoadingViewHolder(RepoLoadingBinding.inflate(layoutInflater, parent, false))
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is RepoInfoViewHolder) {
+            showRepoInfoView(holder, position)
+        } else if (holder is LoadingViewHolder) {
+            showLoadingView(holder, position)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (getItem(position).ownerIconUrl == "LAST_NULL") VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
+    }
+
+    private fun showRepoInfoView(holder: RepoInfoViewHolder, position: Int) {
         val item = getItem(position)
         holder.bind(item, viewLifecycleOwner)
         holder.itemView.setOnClickListener {
@@ -36,9 +67,7 @@ class ResultListAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepoInfoViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        return RepoInfoViewHolder(RepoInfoViewBinding.inflate(layoutInflater, parent, false))
-    }
+    private fun showLoadingView(viewHolder: LoadingViewHolder, position: Int) {}
+
 
 }

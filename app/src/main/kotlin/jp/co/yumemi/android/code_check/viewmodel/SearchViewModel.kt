@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.data.SearchResultRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for [jp.co.yumemi.android.code_check.ui.SearchFragment]
@@ -29,17 +31,34 @@ class SearchViewModel : ViewModel() {
     val readMe: LiveData<String> = _readMe
 
     fun doSearch(keyWord: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             searchResultRepository.doSearch(keyWord).let { result ->
                 result.fold(
                     onSuccess = {
-                        _searchResults.value = it
+                        withContext(Dispatchers.Main) {
+                            _searchResults.value = it
+                        }
                     },
                     onFailure = {
                         it.printStackTrace()
                     }
                 )
             }
+        }
+    }
+
+    suspend fun doPageSearch() {
+        searchResultRepository.doPageSearch().let { result ->
+            result.fold(
+                onSuccess = {
+                    withContext(Dispatchers.Main) {
+                        _searchResults.value = it
+                    }
+                },
+                onFailure = {
+                    it.printStackTrace()
+                }
+            )
         }
     }
 
@@ -52,14 +71,18 @@ class SearchViewModel : ViewModel() {
 
     private fun getReadMe() {
         selectedResults.value?.fullName?.let { fullName ->
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 searchResultRepository.getReadMe(fullName).let { result ->
                     result.fold(
                         onSuccess = {
-                            _readMe.value = it
+                            withContext(Dispatchers.Main) {
+                                _readMe.value = it
+                            }
                         },
                         onFailure = {
-                            _readMe.value = "No README.md"
+                            withContext(Dispatchers.Main) {
+                                _readMe.value = "No README.md"
+                            }
                         }
                     )
                 }

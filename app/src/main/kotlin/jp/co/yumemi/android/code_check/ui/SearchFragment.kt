@@ -13,13 +13,18 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
@@ -31,20 +36,25 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private lateinit var adapter: ResultListAdapter
 
+    private var isLoading = false
+
+    private var lastKeyWord = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        adapter = ResultListAdapter(viewLifecycleOwner, object : ResultListAdapter.OnItemClickListener {
-            override fun itemClick(RepoInfo: RepoInfo) {
-                gotoRepositoryFragment(RepoInfo)
-            }
-        })
+        adapter =
+            ResultListAdapter(viewLifecycleOwner, object : ResultListAdapter.OnItemClickListener {
+                override fun itemClick(RepoInfo: RepoInfo) {
+                    gotoRepositoryFragment(RepoInfo)
+                }
+            })
 
         searchViewModel.searchResults.observe(viewLifecycleOwner) { searchResults ->
-            adapter.submitList(searchResults)
+            adapter.submitList(searchResults.toList())
         }
         return binding.root
     }
@@ -55,7 +65,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) {
                 editText.text.toString().let { keyword ->
-                    if (keyword.isNotEmpty()) {
+                    if (keyword.isNotEmpty() && lastKeyWord != keyword) {
+                        lastKeyWord = keyword
                         searchViewModel.doSearch(keyword)
                     }
                     hideSoftInput(view)
@@ -68,6 +79,29 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         binding.recyclerView.let {
             it.layoutManager = LinearLayoutManager(requireContext())
             it.adapter = adapter
+            it.addOnScrollListener(object : OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
+                    if (!isLoading) {
+                        if (linearLayoutManager != null
+                            && linearLayoutManager.findLastCompletelyVisibleItemPosition() == searchViewModel.searchResults.value?.size?.minus(
+                                1
+                            )
+                        ) {
+                            isLoading = true
+                            loadMore()
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    fun loadMore() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            searchViewModel.doPageSearch()
+            isLoading = false
         }
     }
 
