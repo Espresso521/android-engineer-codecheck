@@ -5,6 +5,7 @@
 
     <data>
         <import type="jp.co.yumemi.android.code_check.ui.adapter.BindingAdapters" />
+        <import type="android.view.View"/>
 
         <variable
             name="repoInfo"
@@ -31,7 +32,7 @@
                 android:id="@+id/ownerIconView"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                app:avatar="@{repoInfo.ownerIconUrl}"
+                app:avatar="@{repoInfo.owner.ownerIconUrl}"
                 android:contentDescription="@null"
                 android:src="@drawable/jetbrains"
                 app:layout_constraintDimensionRatio="1:1" />
@@ -42,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="10dp"
-                android:text="@{repoInfo.loginName, default=@string/app_name}"
+                android:text="@{repoInfo.owner.loginName, default=@string/app_name}"
                 android:textSize="12sp"
                 android:textColor="@color/gray" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -109,6 +110,7 @@
                 android:contentDescription="@null"
                 android:layout_marginStart="15dp"
                 android:src="@mipmap/circle"
+                android:visibility="@{repoInfo.language == null ? View.GONE : View.VISIBLE}"
                 app:layout_constraintDimensionRatio="1:1" />
 
             <TextView
@@ -117,7 +119,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="3dp"
-                android:text="@{repoInfo.language ?? repoInfo.name}"
+                android:text="@{repoInfo.language}"
+                android:visibility="@{repoInfo.language == null ? View.GONE : View.VISIBLE}"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/gray"

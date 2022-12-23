@@ -56,7 +56,7 @@ class ResultListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (getItem(position).ownerIconUrl == "LAST_NULL") VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
+        return if (getItem(position).owner.ownerIconUrl == "LAST_NULL") VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
     }
 
     private fun showRepoInfoView(holder: RepoInfoViewHolder, position: Int) {

@@ -1,6 +1,7 @@
 package jp.co.yumemi.android.code_check.data
 
 import android.util.Log
+import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
@@ -26,18 +27,18 @@ class SearchResultRepository {
 
     private var INSTANCE: HttpClient? = client()
 
+    val LAST_NULL = "LAST_NULL"
     private val nullRepoInfo = RepoInfo(
-        name = "LAST_NULL",
-        fullName = "LAST_NULL",
-        loginName = "LAST_NULL",
-        ownerIconUrl = "LAST_NULL",
-        language = "LAST_NULL",
-        description = "LAST_NULL",
+        name = LAST_NULL,
+        fullName = LAST_NULL,
+        language = LAST_NULL,
+        description = LAST_NULL,
         stargazersCount = 0,
         watchersCount = 0,
         forksCount = 0,
         openIssuesCount = 0,
-        createdTime = "LAST_NULL"
+        createdTime = LAST_NULL,
+        owner = RepoOwner(LAST_NULL, LAST_NULL)
     )
 
     fun client(): HttpClient {
@@ -103,6 +104,7 @@ class SearchResultRepository {
             return@runCatching resultList
         }
     }.onFailure {
+        // TODO : invalid: 422 Unprocessable Entity. Text: "{"message":"Only the first 1000 search results are available","documentation_url":"https://docs.github.com/v3/search/"}"
         Log.e("SearchResultRepository", "Exception: ${it.stackTraceToString()}")
     }
 
@@ -115,35 +117,7 @@ class SearchResultRepository {
             jsonObject.optJSONArray("items")?.let { JSONArray ->
                 for (i in 0 until JSONArray.length()) {
                     JSONArray.optJSONObject(i)?.let { jsonItem ->
-                        val fullName = jsonItem.optString("full_name")
-                        val name = jsonItem.optString("name")
-                        val ownerIconUrl =
-                            jsonItem.optJSONObject("owner")?.optString("avatar_url") ?: ""
-                        val loginName =
-                            jsonItem.optJSONObject("owner")?.optString("login") ?: ""
-                        val language = jsonItem.optString("language")
-                        val stargazersCount = jsonItem.optLong("stargazers_count")
-                        val watchersCount = jsonItem.optLong("watchers_count")
-                        val forksCount = jsonItem.optLong("forks")
-                        val openIssuesCount = jsonItem.optLong("open_issues_count")
-                        val description = jsonItem.optString("description")
-                        val createdTime = jsonItem.optString("created_at")
-
-                        resultList.add(
-                            RepoInfo(
-                                name = name,
-                                fullName = fullName,
-                                loginName = loginName,
-                                ownerIconUrl = ownerIconUrl,
-                                language = language,
-                                description = description,
-                                stargazersCount = stargazersCount,
-                                watchersCount = watchersCount,
-                                forksCount = forksCount,
-                                openIssuesCount = openIssuesCount,
-                                createdTime = createdTime
-                            )
-                        )
+                        resultList.add(Gson().fromJson(jsonItem.toString(), RepoInfo::class.java))
                     }
                 }
                 resultList.add(nullRepoInfo)

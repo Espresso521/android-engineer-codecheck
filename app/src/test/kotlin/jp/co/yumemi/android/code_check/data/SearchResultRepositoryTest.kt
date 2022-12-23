@@ -58,8 +58,8 @@ class SearchResultRepositoryTest {
         searchResultRepository.doSearch("java").let { result ->
             result.fold(
                 onSuccess = {
-                    assertEquals(it[0].loginName, "JetBrains")
-                    assertEquals(it[1].loginName, "hussien89aa")
+                    assertEquals(it[0].owner.loginName, "JetBrains")
+                    assertEquals(it[1].owner.loginName, "hussien89aa")
                 },
                 onFailure = {
                     assert(false)
@@ -76,7 +76,10 @@ class SearchResultRepositoryTest {
         searchResultRepository.doSearch("").let { result ->
             result.fold(
                 onSuccess = {
-                    assert(false)
+                    if (it.isEmpty())
+                        assert(true)
+                    else
+                        assert(false)
                 },
                 onFailure = {
                     assert(true)
