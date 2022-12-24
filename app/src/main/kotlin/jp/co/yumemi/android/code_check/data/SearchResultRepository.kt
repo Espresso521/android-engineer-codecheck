@@ -110,18 +110,12 @@ class SearchResultRepository {
 
 
     private suspend fun parseSearchResultJson(response: HttpResponse) {
-
         if (resultList.size > 0 && resultList.last()?.fullName == "LAST_NULL") resultList.removeLast()
 
-        JSONObject(response.receive<String>()).let { jsonObject ->
-            jsonObject.optJSONArray("items")?.let { JSONArray ->
-                for (i in 0 until JSONArray.length()) {
-                    JSONArray.optJSONObject(i)?.let { jsonItem ->
-                        resultList.add(Gson().fromJson(jsonItem.toString(), RepoInfo::class.java))
-                    }
-                }
-                resultList.add(nullRepoInfo)
-            }
+        val searchResult = Gson().fromJson(response.receive<String>(), SearchResult::class.java)
+        if(searchResult.items.isNotEmpty()) {
+            resultList.addAll(searchResult.items)
+            resultList.add(nullRepoInfo)
         }
     }
 

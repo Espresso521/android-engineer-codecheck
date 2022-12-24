@@ -5,6 +5,19 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 /**
+ * search result data class
+ */
+@Parcelize
+data class SearchResult(
+    @SerializedName("total_count")
+    val totalCount: Long,
+    @SerializedName("incomplete_results")
+    val incomplete: Boolean,
+    @SerializedName("items")
+    val items: List<RepoInfo>
+) : Parcelable
+
+/**
  * repository information data class
  */
 @Parcelize
