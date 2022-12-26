@@ -3,15 +3,9 @@
  */
 package jp.co.yumemi.android.code_check.ui
 
-import android.content.Context
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
-import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
@@ -28,11 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SearchFragment : Fragment(R.layout.fragment_search) {
-
-    private var _binding: FragmentSearchBinding? = null
-
-    private val binding get() = _binding!!
+class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
 
     private val searchViewModel: SearchViewModel by activityViewModels()
 
@@ -42,12 +31,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private var lastKeyWord = ""
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-
+    override fun setUpViewsAndObserve(view: View) {
         adapter =
             ResultListAdapter(viewLifecycleOwner, object : ResultListAdapter.OnItemClickListener {
                 override fun itemClick(RepoInfo: RepoInfo) {
@@ -58,11 +42,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         searchViewModel.searchResults.observe(viewLifecycleOwner) { searchResults ->
             adapter.submitList(searchResults.toList())
         }
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) {
@@ -107,11 +86,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     fun gotoRepositoryFragment(repoInfo: RepoInfo) {
         searchViewModel.setSelectedItem(repoInfo)
         if (resources.configuration.orientation == ORIENTATION_PORTRAIT) {
@@ -119,13 +93,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment()
             )
         }
-    }
-
-    private fun hideSoftInput(view: View) {
-        (view.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-            view.windowToken,
-            0
-        )
     }
 
 }

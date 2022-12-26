@@ -16,14 +16,6 @@ import javax.inject.Singleton
 @Singleton
 class SearchResultRepository @Inject constructor() {
 
-    companion object {
-        fun getInstance() = Helper.instance
-    }
-
-    private object Helper {
-        val instance = SearchResultRepository()
-    }
-
     private val resultList = mutableListOf<RepoInfo>()
     var lastTimeKeyWord = ""
 
