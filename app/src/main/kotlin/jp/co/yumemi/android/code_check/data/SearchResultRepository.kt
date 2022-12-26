@@ -5,11 +5,10 @@ import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
-import io.ktor.client.features.observer.*
+import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import jp.co.yumemi.android.code_check.MainActivity
-import org.json.JSONObject
 import java.util.*
 
 class SearchResultRepository {
@@ -112,7 +111,7 @@ class SearchResultRepository {
     private suspend fun parseSearchResultJson(response: HttpResponse) {
         if (resultList.size > 0 && resultList.last()?.fullName == "LAST_NULL") resultList.removeLast()
 
-        val searchResult = Gson().fromJson(response.receive<String>(), SearchResult::class.java)
+        val searchResult = Gson().fromJson(response.body<String>(), SearchResult::class.java)
         if(searchResult.items.isNotEmpty()) {
             resultList.addAll(searchResult.items)
             resultList.add(nullRepoInfo)
@@ -127,7 +126,7 @@ class SearchResultRepository {
                     header("Accept", "application/vnd.github.v3+json")
                 }
 
-            response.receive<String>().let {
+            response.body<String>().let {
                 return@runCatching it
             }
         }
