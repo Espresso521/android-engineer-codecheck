@@ -10,8 +10,11 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import jp.co.yumemi.android.code_check.MainActivity
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SearchResultRepository {
+@Singleton
+class SearchResultRepository @Inject constructor() {
 
     companion object {
         fun getInstance() = Helper.instance

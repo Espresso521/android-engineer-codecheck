@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
@@ -26,6 +27,7 @@ import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private var _binding: FragmentSearchBinding? = null
@@ -114,9 +116,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         searchViewModel.setSelectedItem(repoInfo)
         if (resources.configuration.orientation == ORIENTATION_PORTRAIT) {
             findNavController().navigate(
-                SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment(
-                    repoInfo = repoInfo
-                )
+                SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment()
             )
         }
     }

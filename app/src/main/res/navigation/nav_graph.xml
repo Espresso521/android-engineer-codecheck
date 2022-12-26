@@ -19,9 +19,6 @@
         android:name="jp.co.yumemi.android.code_check.ui.ResultOutlineFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_result">
-        <argument
-            android:name="repoInfo"
-            app:argType="jp.co.yumemi.android.code_check.data.RepoInfo" />
     </fragment>
 
 </navigation>
