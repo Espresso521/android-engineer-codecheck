@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.data.RepoInfo
-import jp.co.yumemi.android.code_check.data.SearchResultRepository
+import jp.co.yumemi.android.code_check.data.ISearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,8 +19,10 @@ import javax.inject.Inject
  * ViewModel for [jp.co.yumemi.android.code_check.ui.SearchFragment]
  */
 @HiltViewModel
-class SearchViewModel @Inject constructor(private val searchResultRepository: SearchResultRepository) :
+class SearchViewModel @Inject constructor():
     ViewModel() {
+
+    @Inject lateinit var searchResultRepository : ISearchRepository
 
     private var _searchResults: MutableLiveData<List<RepoInfo>> = MutableLiveData(listOf())
     val searchResults: LiveData<List<RepoInfo>> = _searchResults

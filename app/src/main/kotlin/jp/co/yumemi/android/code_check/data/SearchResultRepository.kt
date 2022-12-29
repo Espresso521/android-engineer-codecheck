@@ -4,8 +4,6 @@ import android.util.Log
 import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import jp.co.yumemi.android.code_check.MainActivity
@@ -14,12 +12,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SearchResultRepository @Inject constructor() {
+class SearchResultRepository @Inject constructor(
+    private val httpClient: HttpClient
+) : ISearchRepository {
 
     private val resultList = mutableListOf<RepoInfo>()
     var lastTimeKeyWord = ""
-
-    private var INSTANCE: HttpClient? = client()
 
     val LAST_NULL = "LAST_NULL"
     private val nullRepoInfo = RepoInfo(
@@ -35,34 +33,12 @@ class SearchResultRepository @Inject constructor() {
         owner = RepoOwner(LAST_NULL, LAST_NULL)
     )
 
-    fun client(): HttpClient {
-        return INSTANCE ?: synchronized(this) {
-            val newInstance = HttpClient(Android) {
-                install(ResponseObserver) {
-                    /**
-                     *  status  description
-                     *   200     OK
-                     *   304     Not modified
-                     *   422     Validation failed, or the endpoint has been spammed.
-                     *   503     Service unavailable
-                     */
-                    onResponse { response ->
-                        Log.d("SearchViewModel", "HTTP status: ${response.status.value}")
-                    }
-                }
-            }
-            INSTANCE = newInstance
-            newInstance
-        }
-    }
-
-    fun close() {
+    override fun close() {
         Log.d("SearchResultRepository", "closing the client...")
-        INSTANCE?.close()
-        INSTANCE = null
+        httpClient.close()
     }
 
-    suspend fun doSearch(keyWord: String): Result<List<RepoInfo>> = runCatching {
+    override suspend fun doSearch(keyWord: String): Result<List<RepoInfo>> = runCatching {
         if (lastTimeKeyWord == keyWord) {
             // the same keyWord, just return resultList
             return@runCatching resultList
@@ -72,7 +48,7 @@ class SearchResultRepository @Inject constructor() {
             resultList.clear()
         }
 
-        with(client()) {
+        with(httpClient) {
             val response: HttpResponse = get("https://api.github.com/search/repositories") {
                 header("Accept", "application/vnd.github.v3+json")
                 parameter("q", keyWord)
@@ -86,8 +62,8 @@ class SearchResultRepository @Inject constructor() {
         Log.e("SearchResultRepository", "Exception: ${it.stackTraceToString()}")
     }
 
-    suspend fun doPageSearch(): Result<List<RepoInfo>> = runCatching {
-        with(client()) {
+    override suspend fun doPageSearch(): Result<List<RepoInfo>> = runCatching {
+        with(httpClient) {
             val response: HttpResponse = get("https://api.github.com/search/repositories") {
                 header("Accept", "application/vnd.github.v3+json")
                 parameter("q", lastTimeKeyWord)
@@ -102,20 +78,9 @@ class SearchResultRepository @Inject constructor() {
         Log.e("SearchResultRepository", "Exception: ${it.stackTraceToString()}")
     }
 
-
-    private suspend fun parseSearchResultJson(response: HttpResponse) {
-        if (resultList.size > 0 && resultList.last()?.fullName == "LAST_NULL") resultList.removeLast()
-
-        val searchResult = Gson().fromJson(response.body<String>(), SearchResult::class.java)
-        if(searchResult.items.isNotEmpty()) {
-            resultList.addAll(searchResult.items)
-            resultList.add(nullRepoInfo)
-        }
-    }
-
     //https://raw.githubusercontent.com/singgel/JAVA/master/README.md
-    suspend fun getReadMe(fullName: String): Result<String> = kotlin.runCatching {
-        with(client()) {
+    override suspend fun getReadMe(fullName: String): Result<String> = kotlin.runCatching {
+        with(httpClient) {
             val response: HttpResponse =
                 get("https://raw.githubusercontent.com/$fullName/master/README.md") {
                     header("Accept", "application/vnd.github.v3+json")
@@ -127,5 +92,15 @@ class SearchResultRepository @Inject constructor() {
         }
     }.onFailure {
         Log.e("SearchResultRepository", "Exception: ${it.stackTraceToString()}")
+    }
+
+    private suspend fun parseSearchResultJson(response: HttpResponse) {
+        if (resultList.size > 0 && resultList.last()?.fullName == "LAST_NULL") resultList.removeLast()
+
+        val searchResult = Gson().fromJson(response.body<String>(), SearchResult::class.java)
+        if(searchResult.items.isNotEmpty()) {
+            resultList.addAll(searchResult.items)
+            resultList.add(nullRepoInfo)
+        }
     }
 }
