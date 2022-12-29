@@ -19,25 +19,26 @@ import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
 
     private val searchViewModel: SearchViewModel by activityViewModels()
 
-    private lateinit var adapter: ResultListAdapter
+    @Inject
+    lateinit var adapter: ResultListAdapter
 
     private var isLoading = false
 
     private var lastKeyWord = ""
 
     override fun setUpViewsAndObserve(view: View) {
-        adapter =
-            ResultListAdapter(viewLifecycleOwner, object : ResultListAdapter.OnItemClickListener {
-                override fun itemClick(RepoInfo: RepoInfo) {
-                    gotoRepositoryFragment(RepoInfo)
-                }
-            })
+        adapter.onItemClickListener = object : ResultListAdapter.OnItemClickListener {
+            override fun itemClick(RepoInfo: RepoInfo) {
+                gotoRepositoryFragment(RepoInfo)
+            }
+        }
 
         searchViewModel.searchResults.observe(viewLifecycleOwner) { searchResults ->
             adapter.submitList(searchResults.toList())

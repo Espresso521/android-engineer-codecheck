@@ -2,16 +2,17 @@ package jp.co.yumemi.android.code_check.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.RepoInfoViewBinding
 import jp.co.yumemi.android.code_check.databinding.RepoLoadingBinding
+import javax.inject.Inject
 
-class ResultListAdapter(
-    private val viewLifecycleOwner: LifecycleOwner,
-    private val itemClickListener: OnItemClickListener,
+class ResultListAdapter @Inject constructor(
+    private val fragment: Fragment,
 ) : ListAdapter<RepoInfo, RecyclerView.ViewHolder>(RepoInfoDiffCB()) {
 
     private val VIEW_TYPE_ITEM = 0
@@ -32,6 +33,8 @@ class ResultListAdapter(
         RecyclerView.ViewHolder(binding.root) {
         var progressBar  = binding.loadProgressBar
     }
+
+    lateinit var onItemClickListener : OnItemClickListener
 
     interface OnItemClickListener {
         fun itemClick(RepoInfo: RepoInfo)
@@ -61,9 +64,9 @@ class ResultListAdapter(
 
     private fun showRepoInfoView(holder: RepoInfoViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item, viewLifecycleOwner)
+        holder.bind(item, fragment.viewLifecycleOwner)
         holder.itemView.setOnClickListener {
-            itemClickListener.itemClick(item)
+            onItemClickListener.itemClick(item)
         }
     }
 
