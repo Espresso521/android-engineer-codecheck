@@ -8,21 +8,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.data.ISearchRepository
-import kotlinx.coroutines.Dispatchers
+import jp.co.yumemi.android.code_check.data.RepoInfo
+import jp.co.yumemi.android.code_check.di.IoDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
  * ViewModel for [jp.co.yumemi.android.code_check.ui.SearchFragment]
  */
 @HiltViewModel
-class SearchViewModel @Inject constructor():
+class SearchViewModel @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) :
     ViewModel() {
 
-    @Inject lateinit var searchResultRepository : ISearchRepository
+    @Inject
+    lateinit var searchResultRepository: ISearchRepository
 
     private var _searchResults: MutableLiveData<List<RepoInfo>> = MutableLiveData(listOf())
     val searchResults: LiveData<List<RepoInfo>> = _searchResults
@@ -34,13 +37,11 @@ class SearchViewModel @Inject constructor():
     val readMe: LiveData<String> = _readMe
 
     fun doSearch(keyWord: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             searchResultRepository.doSearch(keyWord).let { result ->
                 result.fold(
                     onSuccess = {
-                        withContext(Dispatchers.Main) {
-                            _searchResults.value = it
-                        }
+                        _searchResults.postValue(it)
                     },
                     onFailure = {
                         it.printStackTrace()
@@ -50,18 +51,18 @@ class SearchViewModel @Inject constructor():
         }
     }
 
-    suspend fun doPageSearch() {
-        searchResultRepository.doPageSearch().let { result ->
-            result.fold(
-                onSuccess = {
-                    withContext(Dispatchers.Main) {
-                        _searchResults.value = it
+    fun doPageSearch() {
+        viewModelScope.launch(ioDispatcher) {
+            searchResultRepository.doPageSearch().let { result ->
+                result.fold(
+                    onSuccess = {
+                        _searchResults.postValue(it)
+                    },
+                    onFailure = {
+                        it.printStackTrace()
                     }
-                },
-                onFailure = {
-                    it.printStackTrace()
-                }
-            )
+                )
+            }
         }
     }
 
@@ -74,18 +75,14 @@ class SearchViewModel @Inject constructor():
 
     private fun getReadMe() {
         selectedResults.value?.fullName?.let { fullName ->
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch((ioDispatcher)) {
                 searchResultRepository.getReadMe(fullName).let { result ->
                     result.fold(
                         onSuccess = {
-                            withContext(Dispatchers.Main) {
-                                _readMe.value = it
-                            }
+                            _readMe.postValue(it)
                         },
                         onFailure = {
-                            withContext(Dispatchers.Main) {
-                                _readMe.value = "No README.md"
-                            }
+                            _readMe.postValue("No ReadMe.md")
                         }
                     )
                 }

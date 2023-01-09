@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SearchResultRepository @Inject constructor(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) : ISearchRepository {
 
     private val resultList = mutableListOf<RepoInfo>()

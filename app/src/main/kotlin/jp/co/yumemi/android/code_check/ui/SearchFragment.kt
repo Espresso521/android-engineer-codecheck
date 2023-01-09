@@ -7,7 +7,6 @@ import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,8 +16,6 @@ import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -81,10 +78,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     }
 
     fun loadMore() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            searchViewModel.doPageSearch()
-            isLoading = false
-        }
+        searchViewModel.doPageSearch()
     }
 
     fun gotoRepositoryFragment(repoInfo: RepoInfo) {
