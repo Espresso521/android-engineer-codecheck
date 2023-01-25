@@ -21,11 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    var searchResultRepository: ISearchRepository
 ) :
     ViewModel() {
-
-    @Inject
-    lateinit var searchResultRepository: ISearchRepository
 
     private var _searchResults: MutableLiveData<List<RepoInfo>> = MutableLiveData(listOf())
     val searchResults: LiveData<List<RepoInfo>> = _searchResults
