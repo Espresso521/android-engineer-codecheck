@@ -2,19 +2,17 @@ package jp.co.yumemi.android.code_check.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.media.Image
-import android.media.Image.Plane
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.util.SparseIntArray
 import android.view.Surface
-import android.widget.ImageView
 import dagger.hilt.android.qualifiers.ActivityContext
+import java.nio.ByteBuffer
 import java.util.*
 import javax.inject.Inject
 
@@ -34,12 +32,14 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private lateinit var previewDataReader: ImageReader
     private lateinit var captureDataReader: ImageReader
     private lateinit var previewSurface: Surface
+    private var jpegOrientation: Int = 0
+    private var cameraDataListener: ICameraDataListener? = null
 
     private var orientations: SparseIntArray = SparseIntArray(4).apply {
-        append(Surface.ROTATION_0, 0)
-        append(Surface.ROTATION_90, 90)
-        append(Surface.ROTATION_180, 180)
-        append(Surface.ROTATION_270, 270)
+        append(Surface.ROTATION_0, 90)
+        append(Surface.ROTATION_90, 0)
+        append(Surface.ROTATION_180, 270)
+        append(Surface.ROTATION_270, 180)
     }
 
     fun startBackgroundThread() {
@@ -74,8 +74,9 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
     }
 
-    fun setupCamera(previewSurface: Surface) {
+    fun setupCamera(previewSurface: Surface, cameraDataListener: ICameraDataListener) {
         this.previewSurface = previewSurface
+        this.cameraDataListener = cameraDataListener
         val cameraIds: Array<String> = cameraManager.cameraIdList
 
         for (id in cameraIds) {
@@ -92,22 +93,19 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
                     ).maxByOrNull { it.height * it.width }!!
 
                     Log.e(
-                        TAG,
-                        "photoSize Width is ${photoSize.width}, Height is ${photoSize.height}"
+                        TAG, "photoSize Width is ${photoSize.width}, Height is ${photoSize.height}"
                     )
+
+                    // all reader use 1080P parameter
                     previewDataReader = ImageReader.newInstance(
-                        photoSize.width, photoSize.height, ImageFormat.YUV_420_888, 1
+                        1920, 1080, ImageFormat.YUV_420_888, 1
                     )
                     previewDataReader.setOnImageAvailableListener(
                         onPreviewImageAvailableListener, backgroundHandler
                     )
 
-                    val captureSize = streamConfigurationMap.getOutputSizes(
-                        ImageFormat.JPEG
-                    ).maxByOrNull { it.height * it.width }!!
-
                     captureDataReader = ImageReader.newInstance(
-                        captureSize.width, captureSize.height, ImageFormat.JPEG, 1
+                        1920, 1080, ImageFormat.JPEG, 1
                     )
                     captureDataReader.setOnImageAvailableListener(
                         onCaptureImageAvailableListener, backgroundHandler
@@ -120,28 +118,27 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
     }
 
-
     /**
      * ImageAvailable Listener
      */
     private val onPreviewImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
-        //Toast.makeText(context, "Photo Taken!", Toast.LENGTH_SHORT).show()
-        //Log.d(TAG, "image available")
         val image: Image = reader.acquireNextImage()
+        yuv420888toNV21(image)?.let {
+            this.cameraDataListener?.previewNV21DataListener(it)
+        }
         image.close()
     }
 
     private val onCaptureImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
         Log.d(TAG, "capture image available")
         val image: Image = reader.acquireNextImage()
-        val planes: Array<Plane> = image.planes
-        val buffer = planes[0].buffer
+        val planes = image.planes
+        val buffer: ByteBuffer = planes[0].buffer
         buffer.rewind()
         val data = ByteArray(buffer.capacity())
         buffer[data]
-        val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+        this.cameraDataListener?.takePhotoDataListener(jpegOrientation, data)
         image.close()
-        imageView.post { imageView.setImageBitmap(bitmap) }
     }
 
     /**
@@ -174,20 +171,38 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
     }
 
-    private lateinit var imageView: ImageView
-
-    fun takePhoto(rotation: Int, imageView: ImageView) {
-        this.imageView = imageView
+    fun takePhoto(rotation: Int) {
         val captureRequestBuilder =
             cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
         captureRequestBuilder.addTarget(captureDataReader.surface)
-        //captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, orientations.get(rotation))
+        jpegOrientation = orientations.get(rotation)
         cameraCaptureSession.capture(captureRequestBuilder.build(), null, null)
     }
 
     @SuppressLint("MissingPermission")
     fun connectCamera() {
         cameraManager.openCamera(cameraId, cameraStateCallback, backgroundHandler)
+    }
+
+    private var yBuffer: ByteBuffer? = null
+    private var uBuffer: ByteBuffer? = null
+    private var vBuffer: ByteBuffer? = null
+
+    private fun yuv420888toNV21(image: Image): ByteArray? {
+        val nv21: ByteArray
+        yBuffer = image.planes[0].buffer
+        uBuffer = image.planes[1].buffer
+        vBuffer = image.planes[2].buffer
+        val ySize = yBuffer!!.remaining()
+        val uSize = uBuffer!!.remaining()
+        val vSize = vBuffer!!.remaining()
+        nv21 = ByteArray(ySize + uSize + vSize)
+
+        //U and V are swapped
+        yBuffer!![nv21, 0, ySize]
+        vBuffer!![nv21, ySize, vSize]
+        uBuffer!![nv21, ySize + vSize, uSize]
+        return nv21
     }
 
 }

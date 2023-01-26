@@ -7,6 +7,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.hardware.camera2.*
 import android.net.Uri
 import android.os.Bundle
@@ -20,12 +23,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.camera.CameraCapture
+import jp.co.yumemi.android.code_check.camera.ICameraDataListener
 import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
+class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataListener {
+
+    private val TAG = CameraActivity::class.simpleName
 
     val CAMERA_REQUEST_RESULT = 1
 
@@ -54,7 +60,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
         super.onResume()
         capture.startBackgroundThread()
         if (binding.surfaceView.isActivated && shouldProceedWithOnResume) {
-            binding.surfaceView.holder.surface?.let { capture.setupCamera(it) }
+            binding.surfaceView.holder.surface?.let { capture.setupCamera(it, this@CameraActivity) }
         } else if (!binding.surfaceView.isActivated) {
             binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         }
@@ -114,8 +120,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
      */
     private val surfaceViewCallBack = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
-            if(wasCameraPermissionWasGiven()) {
-                capture.setupCamera(holder.surface)
+            if (wasCameraPermissionWasGiven()) {
+                capture.setupCamera(holder.surface, this@CameraActivity)
                 capture.connectCamera()
             }
         }
@@ -125,13 +131,32 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Log.e("CameraActivity","SurfaceView Destroyed")
+            Log.e("CameraActivity", "SurfaceView Destroyed")
         }
 
     }
 
     fun takePhoto(view: View) {
-        capture.takePhoto(windowManager.defaultDisplay.rotation, binding.captureImgView)
+        capture.takePhoto(windowManager.defaultDisplay.rotation)
+    }
+
+    override fun takePhotoDataListener(orientation: Int, data: ByteArray) {
+        var bitmap: Bitmap? = BitmapFactory.decodeByteArray(data, 0, data.size) ?: return
+
+        if (orientation != 0) {
+            var matrix = Matrix()
+            matrix.postRotate(orientation.toFloat())
+            Log.e(TAG, "jpeg orientation is " + orientation.toFloat())
+            bitmap = bitmap?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
+        }
+
+        binding.captureImgView.let {
+            it.post { it.setImageBitmap(bitmap) }
+        }
+    }
+
+    override fun previewNV21DataListener(data: ByteArray) {
+        // TODO: add to LinkedBlockingQueue for produce and consume
     }
 
 }
