@@ -11,14 +11,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4"/>
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
 
     <SurfaceView
         android:id="@+id/surfaceView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="9:16"
         app:layout_constraintBottom_toTopOf="@+id/guide1"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/guide2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

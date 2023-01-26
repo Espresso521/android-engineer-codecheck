@@ -9,7 +9,6 @@ import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
-import android.util.Size
 import android.util.SparseIntArray
 import android.view.Surface
 import android.widget.Toast
@@ -19,6 +18,8 @@ import javax.inject.Inject
 
 class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
 
+    private val TAG = CameraCapture::class.simpleName
+
     private val cameraManager: CameraManager =
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
@@ -26,10 +27,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private lateinit var backgroundHandlerThread: HandlerThread
     private lateinit var backgroundHandler: Handler
     private lateinit var cameraDevice: CameraDevice
-    private lateinit var captureRequestBuilder: CaptureRequest.Builder
     private lateinit var cameraCaptureSession: CameraCaptureSession
     private lateinit var imageReader: ImageReader
-    private lateinit var previewSize: Size
     private lateinit var previewSurface: Surface
 
     private var orientations: SparseIntArray = SparseIntArray(4).apply {
@@ -53,7 +52,7 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     /**
      * Capture State Callback
      */
-    private val captureStateCallback = object : CameraCaptureSession.StateCallback() {
+    private val captureSessionStateCallback = object : CameraCaptureSession.StateCallback() {
         override fun onConfigureFailed(session: CameraCaptureSession) {
             //
         }
@@ -61,10 +60,11 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         override fun onConfigured(session: CameraCaptureSession) {
             cameraCaptureSession = session
 
+            val previewRequestBuilder =
+                cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+            previewRequestBuilder.addTarget(previewSurface)
             cameraCaptureSession.setRepeatingRequest(
-                captureRequestBuilder.build(),
-                null,
-                backgroundHandler
+                previewRequestBuilder.build(), null, backgroundHandler
             )
         }
     }
@@ -83,16 +83,12 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
 
         override fun onCaptureProgressed(
-            session: CameraCaptureSession,
-            request: CaptureRequest,
-            partialResult: CaptureResult
+            session: CameraCaptureSession, request: CaptureRequest, partialResult: CaptureResult
         ) { //
         }
 
         override fun onCaptureCompleted(
-            session: CameraCaptureSession,
-            request: CaptureRequest,
-            result: TotalCaptureResult
+            session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult
         ) {
             //
         }
@@ -110,23 +106,24 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
             }
 
             cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                ?.let { st ->
-                    previewSize = st.getOutputSizes(
-                        ImageFormat.JPEG
+                ?.let { streamConfigurationMap ->
+                    val photoSize = streamConfigurationMap.getOutputSizes(
+                        ImageFormat.YUV_420_888
                     ).maxByOrNull { it.height * it.width }!!
+
+                    Log.e(
+                        TAG,
+                        "photoSize Width is ${photoSize.width}, Height is ${photoSize.height}"
+                    )
                     imageReader = ImageReader.newInstance(
-                        previewSize.width,
-                        previewSize.height,
-                        ImageFormat.JPEG,
-                        1
+                        photoSize.width, photoSize.height, ImageFormat.YUV_420_888, 1
                     )
                     imageReader.setOnImageAvailableListener(
-                        onImageAvailableListener,
-                        backgroundHandler
+                        onImageAvailableListener, backgroundHandler
                     )
                 }
-
             cameraId = id
+
         }
     }
 
@@ -146,14 +143,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private val cameraStateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
-
-            captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-            captureRequestBuilder.addTarget(previewSurface)
-
             cameraDevice.createCaptureSession(
-                listOf(previewSurface, imageReader.surface),
-                captureStateCallback,
-                null
+                listOf(previewSurface, imageReader.surface), captureSessionStateCallback, null
             )
         }
 
@@ -170,12 +161,12 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
                 ERROR_MAX_CAMERAS_IN_USE -> "Maximum cameras in use"
                 else -> "Unknown"
             }
-            Log.e("CameraCapture", "Error when trying to connect camera $errorMsg")
+            Log.e(TAG, "Error when trying to connect camera $errorMsg")
         }
     }
 
     fun takePhoto(rotation: Int) {
-        captureRequestBuilder =
+        val captureRequestBuilder =
             cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
         captureRequestBuilder.addTarget(imageReader.surface)
         captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, orientations.get(rotation))
