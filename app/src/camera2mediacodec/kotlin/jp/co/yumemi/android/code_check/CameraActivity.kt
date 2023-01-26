@@ -131,7 +131,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     }
 
     fun takePhoto(view: View) {
-        capture.takePhoto(windowManager.defaultDisplay.rotation)
+        capture.takePhoto(windowManager.defaultDisplay.rotation, binding.captureImgView)
     }
 
 }

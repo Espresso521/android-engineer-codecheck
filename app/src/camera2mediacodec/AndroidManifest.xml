@@ -17,6 +17,7 @@
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
             android:name="jp.co.yumemi.android.code_check.CameraActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

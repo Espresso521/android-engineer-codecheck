@@ -30,6 +30,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/captureImgView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="9:16"
+        app:layout_constraintTop_toBottomOf="@+id/guide1"
+        app:layout_constraintEnd_toEndOf="@+id/guide2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <Button
         android:id="@+id/takePhotoBtn"
         android:layout_width="wrap_content"

@@ -2,19 +2,22 @@ package jp.co.yumemi.android.code_check.camera
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.media.Image
+import android.media.Image.Plane
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.util.SparseIntArray
 import android.view.Surface
-import android.widget.Toast
+import android.widget.ImageView
 import dagger.hilt.android.qualifiers.ActivityContext
 import java.util.*
 import javax.inject.Inject
+
 
 class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
 
@@ -28,7 +31,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private lateinit var backgroundHandler: Handler
     private lateinit var cameraDevice: CameraDevice
     private lateinit var cameraCaptureSession: CameraCaptureSession
-    private lateinit var imageReader: ImageReader
+    private lateinit var previewDataReader: ImageReader
+    private lateinit var captureDataReader: ImageReader
     private lateinit var previewSurface: Surface
 
     private var orientations: SparseIntArray = SparseIntArray(4).apply {
@@ -54,7 +58,7 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
      */
     private val captureSessionStateCallback = object : CameraCaptureSession.StateCallback() {
         override fun onConfigureFailed(session: CameraCaptureSession) {
-            //
+            Log.e(TAG, "capture session onConfigureFailed!!")
         }
 
         override fun onConfigured(session: CameraCaptureSession) {
@@ -63,34 +67,10 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
             val previewRequestBuilder =
                 cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             previewRequestBuilder.addTarget(previewSurface)
+            previewRequestBuilder.addTarget(previewDataReader.surface)
             cameraCaptureSession.setRepeatingRequest(
                 previewRequestBuilder.build(), null, backgroundHandler
             )
-        }
-    }
-
-    /**
-     * Capture Callback
-     */
-    private val captureCallback = object : CameraCaptureSession.CaptureCallback() {
-
-        override fun onCaptureStarted(
-            session: CameraCaptureSession,
-            request: CaptureRequest,
-            timestamp: Long,
-            frameNumber: Long
-        ) { //
-        }
-
-        override fun onCaptureProgressed(
-            session: CameraCaptureSession, request: CaptureRequest, partialResult: CaptureResult
-        ) { //
-        }
-
-        override fun onCaptureCompleted(
-            session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult
-        ) {
-            //
         }
     }
 
@@ -115,12 +95,25 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
                         TAG,
                         "photoSize Width is ${photoSize.width}, Height is ${photoSize.height}"
                     )
-                    imageReader = ImageReader.newInstance(
+                    previewDataReader = ImageReader.newInstance(
                         photoSize.width, photoSize.height, ImageFormat.YUV_420_888, 1
                     )
-                    imageReader.setOnImageAvailableListener(
-                        onImageAvailableListener, backgroundHandler
+                    previewDataReader.setOnImageAvailableListener(
+                        onPreviewImageAvailableListener, backgroundHandler
                     )
+
+                    val captureSize = streamConfigurationMap.getOutputSizes(
+                        ImageFormat.JPEG
+                    ).maxByOrNull { it.height * it.width }!!
+
+                    captureDataReader = ImageReader.newInstance(
+                        captureSize.width, captureSize.height, ImageFormat.JPEG, 1
+                    )
+                    captureDataReader.setOnImageAvailableListener(
+                        onCaptureImageAvailableListener, backgroundHandler
+                    )
+
+
                 }
             cameraId = id
 
@@ -131,10 +124,24 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     /**
      * ImageAvailable Listener
      */
-    private val onImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
-        Toast.makeText(context, "Photo Taken!", Toast.LENGTH_SHORT).show()
-        val image: Image = reader.acquireLatestImage()
+    private val onPreviewImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
+        //Toast.makeText(context, "Photo Taken!", Toast.LENGTH_SHORT).show()
+        //Log.d(TAG, "image available")
+        val image: Image = reader.acquireNextImage()
         image.close()
+    }
+
+    private val onCaptureImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
+        Log.d(TAG, "capture image available")
+        val image: Image = reader.acquireNextImage()
+        val planes: Array<Plane> = image.planes
+        val buffer = planes[0].buffer
+        buffer.rewind()
+        val data = ByteArray(buffer.capacity())
+        buffer[data]
+        val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+        image.close()
+        imageView.post { imageView.setImageBitmap(bitmap) }
     }
 
     /**
@@ -144,7 +151,9 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
             cameraDevice.createCaptureSession(
-                listOf(previewSurface, imageReader.surface), captureSessionStateCallback, null
+                listOf(previewSurface, previewDataReader.surface, captureDataReader.surface),
+                captureSessionStateCallback,
+                null
             )
         }
 
@@ -165,12 +174,15 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
     }
 
-    fun takePhoto(rotation: Int) {
+    private lateinit var imageView: ImageView
+
+    fun takePhoto(rotation: Int, imageView: ImageView) {
+        this.imageView = imageView
         val captureRequestBuilder =
             cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
-        captureRequestBuilder.addTarget(imageReader.surface)
-        captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, orientations.get(rotation))
-        cameraCaptureSession.capture(captureRequestBuilder.build(), captureCallback, null)
+        captureRequestBuilder.addTarget(captureDataReader.surface)
+        //captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, orientations.get(rotation))
+        cameraCaptureSession.capture(captureRequestBuilder.build(), null, null)
     }
 
     @SuppressLint("MissingPermission")
