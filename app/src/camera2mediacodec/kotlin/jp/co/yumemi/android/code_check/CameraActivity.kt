@@ -7,12 +7,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.TextureView
+import android.util.Log
+import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -45,6 +45,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
         if (!wasCameraPermissionWasGiven()) {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_RESULT)
         }
+        binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         capture.startBackgroundThread()
     }
 
@@ -52,10 +53,10 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     override fun onResume() {
         super.onResume()
         capture.startBackgroundThread()
-        if (binding.textureView.isAvailable && shouldProceedWithOnResume) {
-            binding.textureView.surfaceTexture?.let { capture.setupCamera(it) }
-        } else if (!binding.textureView.isAvailable){
-            binding.textureView.surfaceTextureListener = surfaceTextureListener
+        if (binding.surfaceView.isActivated && shouldProceedWithOnResume) {
+            binding.surfaceView.holder.surface?.let { capture.setupCamera(it) }
+        } else if (!binding.surfaceView.isActivated) {
+            binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         }
         shouldProceedWithOnResume = !shouldProceedWithOnResume
     }
@@ -65,8 +66,11 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
         capture.stopBackgroundThread()
     }
 
-    private fun wasCameraPermissionWasGiven() : Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+    private fun wasCameraPermissionWasGiven(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onRequestPermissionsResult(
@@ -75,8 +79,16 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            surfaceTextureListener.onSurfaceTextureAvailable(binding.textureView.surfaceTexture!!, binding.textureView.width, binding.textureView.height)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            if (binding.surfaceView.isActivated) {
+                surfaceViewCallBack.surfaceCreated(
+                    binding.surfaceView.holder
+                )
+            }
         } else {
             Toast.makeText(
                 this,
@@ -87,7 +99,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     Manifest.permission.CAMERA
-                )) {
+                )
+            ) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 intent.data = Uri.fromParts("package", this.packageName, null)
@@ -99,26 +112,22 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     /**
      * Surface Texture Listener
      */
-    private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-        @SuppressLint("MissingPermission")
-        override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) {
-            if (wasCameraPermissionWasGiven()) {
-                capture.setupCamera(texture)
+    private val surfaceViewCallBack = object : SurfaceHolder.Callback {
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            if(wasCameraPermissionWasGiven()) {
+                capture.setupCamera(holder.surface)
                 capture.connectCamera()
             }
         }
 
-        override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) {
-            //
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            Log.e("CameraActivity", "format is $format, width is $width, height is $height")
         }
 
-        override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
-            return true
+        override fun surfaceDestroyed(holder: SurfaceHolder) {
+            Log.e("CameraActivity","SurfaceView Destroyed")
         }
 
-        override fun onSurfaceTextureUpdated(texture: SurfaceTexture) {
-            //
-        }
     }
 
     fun takePhoto(view: View) {

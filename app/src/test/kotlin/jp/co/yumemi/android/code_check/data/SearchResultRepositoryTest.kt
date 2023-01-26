@@ -53,7 +53,7 @@ class SearchResultRepositoryTest {
     @Test
     fun doSearchJava() = runTest {
 
-        every { searchResultRepository.client() } returns ktorSuccessClient
+        //every { searchResultRepository.client() } returns ktorSuccessClient
 
         searchResultRepository.doSearch("java").let { result ->
             result.fold(
@@ -71,7 +71,7 @@ class SearchResultRepositoryTest {
     @Test
     fun doSearchEmpty() = runTest {
 
-        every { searchResultRepository.client() } returns ktorSuccessClient
+        //every { searchResultRepository.client() } returns ktorSuccessClient
 
         searchResultRepository.doSearch("").let { result ->
             result.fold(

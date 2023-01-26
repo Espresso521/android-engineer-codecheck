@@ -3,9 +3,7 @@ package jp.co.yumemi.android.code_check.camera
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.ImageFormat
-import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
-import android.hardware.camera2.params.StreamConfigurationMap
 import android.media.Image
 import android.media.ImageReader
 import android.os.Handler
@@ -32,7 +30,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private lateinit var cameraCaptureSession: CameraCaptureSession
     private lateinit var imageReader: ImageReader
     private lateinit var previewSize: Size
-    private lateinit var surfaceTexture: SurfaceTexture
+    private lateinit var previewSurface: Surface
+
     private var orientations: SparseIntArray = SparseIntArray(4).apply {
         append(Surface.ROTATION_0, 0)
         append(Surface.ROTATION_90, 90)
@@ -99,35 +98,34 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
     }
 
-    fun setupCamera(surfaceTexture: SurfaceTexture) {
-        this.surfaceTexture = surfaceTexture
+    fun setupCamera(previewSurface: Surface) {
+        this.previewSurface = previewSurface
         val cameraIds: Array<String> = cameraManager.cameraIdList
 
         for (id in cameraIds) {
             val cameraCharacteristics = cameraManager.getCameraCharacteristics(id)
 
-            //If we want to choose the rear facing camera instead of the front facing one
             if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_FRONT) {
                 continue
             }
 
-            val streamConfigurationMap: StreamConfigurationMap? =
-                cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+            cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                ?.let { st ->
+                    previewSize = st.getOutputSizes(
+                        ImageFormat.JPEG
+                    ).maxByOrNull { it.height * it.width }!!
+                    imageReader = ImageReader.newInstance(
+                        previewSize.width,
+                        previewSize.height,
+                        ImageFormat.JPEG,
+                        1
+                    )
+                    imageReader.setOnImageAvailableListener(
+                        onImageAvailableListener,
+                        backgroundHandler
+                    )
+                }
 
-            if (streamConfigurationMap != null) {
-                previewSize =
-                    cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-                        .getOutputSizes(
-                            ImageFormat.JPEG
-                        ).maxByOrNull { it.height * it.width }!!
-                imageReader = ImageReader.newInstance(
-                    previewSize.width,
-                    previewSize.height,
-                    ImageFormat.JPEG,
-                    1
-                )
-                imageReader.setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
-            }
             cameraId = id
         }
     }
@@ -148,8 +146,6 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private val cameraStateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
-            surfaceTexture.setDefaultBufferSize(previewSize.width, previewSize.height)
-            val previewSurface: Surface = Surface(surfaceTexture)
 
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             captureRequestBuilder.addTarget(previewSurface)
