@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jp.co.yumemi.android.code_check">
-
-    <uses-permission android:name="android.permission.INTERNET" />
     
     <application
         android:allowBackup="true"
@@ -14,7 +12,7 @@
         android:theme="@style/Theme.AndroidEngineerCodeCheck"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
-            android:name="jp.co.yumemi.android.code_check.CameraActivity"
+            android:name="jp.co.yumemi.android.code_check.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

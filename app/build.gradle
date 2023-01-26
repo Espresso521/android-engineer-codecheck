@@ -18,6 +18,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        flavorDimensions "HUZE"
     }
 
     buildTypes {
@@ -36,6 +38,16 @@ android {
     buildFeatures {
         viewBinding true
         dataBinding true
+    }
+
+    productFlavors {
+        githubsearch{
+            dimension "HUZE"
+        }
+
+        camera2mediacodec{
+            dimension "HUZE"
+        }
     }
 }
 
