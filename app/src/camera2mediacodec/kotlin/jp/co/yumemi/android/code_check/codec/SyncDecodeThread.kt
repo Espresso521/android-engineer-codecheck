@@ -18,6 +18,10 @@ class SyncDecodeThread @Inject constructor(
     var encodeDecodeDataRepo: EncodeDecodeDataRepo
 ) : Thread() {
 
+    companion object {
+        var frameCount : Long = 1
+    }
+
     private val TAG = SyncDecodeThread::class.simpleName
 
     private var isDecoding = false
@@ -38,34 +42,21 @@ class SyncDecodeThread @Inject constructor(
         var byteBuffer : ByteBuffer?
 
         while (isDecoding) {
-
             val data = encodeDecodeDataRepo.getCodecEncodeData()
             saveToFile(data)
-            val inputBufferIndex = mCodeC.dequeueInputBuffer(10_000)
+            val inputBufferIndex = mCodeC.dequeueInputBuffer(0)
 
             if (inputBufferIndex >= 0) {
                 byteBuffer = mCodeC.getInputBuffer(inputBufferIndex)
-                if (byteBuffer == null) {
-                    continue
-                }
-                byteBuffer.clear()
-                byteBuffer.put(data, 0, data.size)
-                mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, 0, 0)
-            } else {
-                sleep(10);
-                continue;
+                byteBuffer?.clear()
+                byteBuffer?.put(data, 0, data.size)
+                mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, frameCount++ * 1000000 / 30, 0)
             }
 
-            val outIndex: Int = mCodeC.dequeueOutputBuffer(bufferInfo, 0)
-            if(outIndex >=0) {
-                mCodeC.releaseOutputBuffer(outIndex, true)
-            } else {
-                val errorMsg = when (outIndex) {
-                    MediaCodec.INFO_TRY_AGAIN_LATER -> "MediaCodec.INFO_TRY_AGAIN_LATER"
-                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> "MediaCodec.INFO_OUTPUT_FORMAT_CHANGED"
-                    else -> "Unknown"
-                }
-                Log.e(TAG, "Error when Decoding: $errorMsg")
+            var outIndex: Int = mCodeC.dequeueOutputBuffer(bufferInfo, 0)
+            while (outIndex >= 0) {
+                mCodeC.releaseOutputBuffer(outIndex, true);
+                outIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 0);
             }
         }
         mCodeC.stop()

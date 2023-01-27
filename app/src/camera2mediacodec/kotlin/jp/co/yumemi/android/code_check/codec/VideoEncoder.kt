@@ -17,7 +17,7 @@ class VideoEncoder @Inject constructor(var syncEncodeThread: SyncEncodeThread) {
      */
     fun initConfig(width: Int, height: Int) {
         // we rotate 90 degree to the camera preview data, so change the width and height
-        val mVideoFormat: MediaFormat = MediaFormat.createVideoFormat("video/avc", height, width)
+        val mVideoFormat: MediaFormat = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, height, width)
         mVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 25)
         mVideoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2)
         mVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 3)

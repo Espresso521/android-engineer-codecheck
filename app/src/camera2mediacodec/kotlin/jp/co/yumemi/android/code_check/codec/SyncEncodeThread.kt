@@ -18,6 +18,10 @@ class SyncEncodeThread @Inject constructor(
     var encodeDecodeDataRepo: EncodeDecodeDataRepo
 ) : Thread() {
 
+    companion object {
+        var frameCount : Long = 1
+    }
+
     private val TAG = SyncEncodeThread::class.simpleName
 
     private var configByte: ByteArray? = null
@@ -41,15 +45,15 @@ class SyncEncodeThread @Inject constructor(
         while (mIsEncoding) {
 
             val data = encodeDecodeDataRepo.getCameraPreviewData()
-            val inputBufferIndex = mCodeC.dequeueInputBuffer(10_000)
+            val inputBufferIndex = mCodeC.dequeueInputBuffer(0)
             if (inputBufferIndex >= 0) {
                 val inputBuffer: ByteBuffer? = mCodeC.getInputBuffer(inputBufferIndex)
                 inputBuffer?.clear()
                 inputBuffer?.put(data)
-                mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, 0, 0)
+                mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, frameCount++ * 1000000 / 30, 0)
             }
 
-            var outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 10_000)
+            var outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 0)
             if (outputIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 sleep(10)
             } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
@@ -92,7 +96,7 @@ class SyncEncodeThread @Inject constructor(
                         }
                     }
                     mCodeC.releaseOutputBuffer(outputIndex, false)
-                    outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 1_000)
+                    outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 0)
                 }
                 encodeDecodeDataRepo.h264EncodeDataListener(singleData)
                 saveToFile(singleData)
