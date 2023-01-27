@@ -17,7 +17,7 @@ class EncodeDecodeDataRepo @Inject constructor() : ICameraPreviewDataListener, I
     }
 
     fun getCodecEncodeData() : ByteArray {
-        return cameraPreviewBuffer.take()
+        return codecEncodeBuffer.take()
     }
 
     override fun previewNV21DataListener(data: ByteArray) {
@@ -29,6 +29,6 @@ class EncodeDecodeDataRepo @Inject constructor() : ICameraPreviewDataListener, I
     }
 
     override fun h264EncodeDataListener(data: ByteArray) {
-        codecEncodeBuffer.offer(data)
+        codecEncodeBuffer.put(data)
     }
 }

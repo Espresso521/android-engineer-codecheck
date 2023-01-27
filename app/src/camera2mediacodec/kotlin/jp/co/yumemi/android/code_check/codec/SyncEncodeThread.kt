@@ -18,18 +18,17 @@ class SyncEncodeThread @Inject constructor(
     var encodeDecodeDataRepo: EncodeDecodeDataRepo
 ) : Thread() {
 
+    private val TAG = SyncEncodeThread::class.simpleName
+
     private var configByte: ByteArray? = null
     lateinit var mVideoSps: ByteArray
     lateinit var mVideoPps: ByteArray
     private var outputStream: BufferedOutputStream? = null
-    var mIsEncoding = false
+    private var mIsEncoding = false
     var needSaveFile = false
 
     private lateinit var mCodeC: MediaCodec
 
-    companion object {
-        private const val TAG = "SyncEncodeThread"
-    }
 
     fun init(mCodeC: MediaCodec) {
         this.mCodeC = mCodeC

@@ -7,14 +7,14 @@
     tools:context="jp.co.yumemi.android.code_check.CameraActivity">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guide1"
+        android:id="@+id/guideHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guide2"
+        android:id="@+id/guideVertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -25,9 +25,19 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="9:16"
-        app:layout_constraintBottom_toTopOf="@+id/guide1"
-        app:layout_constraintEnd_toEndOf="@+id/guide2"
+        app:layout_constraintBottom_toTopOf="@+id/guideHorizontal"
+        app:layout_constraintEnd_toEndOf="@+id/guideVertical"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <SurfaceView
+        android:id="@+id/surfaceViewDecode"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="9:16"
+        app:layout_constraintBottom_toTopOf="@+id/guideHorizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideVertical"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -35,8 +45,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="9:16"
-        app:layout_constraintTop_toBottomOf="@+id/guide1"
-        app:layout_constraintEnd_toEndOf="@+id/guide2"
+        app:layout_constraintTop_toBottomOf="@+id/guideHorizontal"
+        app:layout_constraintEnd_toEndOf="@+id/guideVertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 

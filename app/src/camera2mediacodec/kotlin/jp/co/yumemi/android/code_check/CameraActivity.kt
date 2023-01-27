@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.camera.CameraCapture
 import jp.co.yumemi.android.code_check.camera.ICameraTakePhotoListener
+import jp.co.yumemi.android.code_check.codec.VideoDecoder
 import jp.co.yumemi.android.code_check.codec.VideoEncoder
 import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
 import java.util.*
@@ -44,6 +45,9 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
     @Inject
     lateinit var videoEncoder: VideoEncoder
 
+    @Inject
+    lateinit var videoDecoder: VideoDecoder
+
     private lateinit var binding: ActivityCameraBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +60,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
             requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_RESULT)
         }
         binding.surfaceView.holder.addCallback(surfaceViewCallBack)
+        binding.surfaceViewDecode.holder.addCallback(decodeSurfaceViewCallBack)
         capture.startBackgroundThread()
     }
 
@@ -137,11 +142,28 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Log.e("CameraActivity", "format is $format, width is $width, height is $height")
+            Log.e("CameraActivity", "Encode width is $width, height is $height")
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Log.e("CameraActivity", "SurfaceView Destroyed")
+            Log.e("CameraActivity", "Encode SurfaceView Destroyed")
+        }
+
+    }
+
+    private val decodeSurfaceViewCallBack = object : SurfaceHolder.Callback {
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            if (wasCameraPermissionWasGiven()) {
+                videoDecoder.initConfig(1080, 1920, holder.surface)
+            }
+        }
+
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            Log.e("CameraActivity", "Decode surface view width is $width, height is $height")
+        }
+
+        override fun surfaceDestroyed(holder: SurfaceHolder) {
+            Log.e("CameraActivity", "Decode SurfaceView Destroyed")
         }
 
     }
@@ -152,9 +174,11 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
 
     fun startRecord(view: View) {
         videoEncoder.start()
+        videoDecoder.start()
     }
     fun stopRecord(view: View) {
         videoEncoder.stop()
+        videoDecoder.stop()
     }
 
     override fun takePhotoDataListener(orientation: Int, data: ByteArray) {

@@ -10,6 +10,7 @@ object YUVUtil {
     private var uBuffer: ByteBuffer? = null
     private var vBuffer: ByteBuffer? = null
     private var nv12: ByteArray? = null
+    private var nv12rotate90: ByteArray? = null
     private var nv21: ByteArray? = null
     private var width: Int? = 0
     private var height: Int? = 0
@@ -19,8 +20,12 @@ object YUVUtil {
             width = image.width
             height = image.height
             nv12 = ByteArray(width!! * height!! * 3 / 2)
+            nv12rotate90 = ByteArray(width!! * height!! * 3 / 2)
         } else if (width != image.width || height != image.height) {
             nv12 = ByteArray(width!! * height!! * 3 / 2)
+            nv12rotate90 = ByteArray(width!! * height!! * 3 / 2)
+            if(width != image.width) width = image.width
+            if(height != image.height) height = image.height
         }
 
         yBuffer = image.planes[0].buffer
@@ -31,7 +36,38 @@ object YUVUtil {
 
         yBuffer!!.get(nv12, 0, ySize)
         uBuffer!!.get(nv12, ySize, uSize)
-        return nv12
+
+        rotateYUV420Degree90(nv12!!, image.width, image.height)
+        return nv12rotate90
+    }
+
+    private fun rotateYUV420Degree90(
+        data: ByteArray,
+        imageWidth: Int,
+        imageHeight: Int
+    ): ByteArray? {
+        val yuv = nv12rotate90!!
+        // Rotate the Y luma
+        var i = 0
+        for (x in 0 until imageWidth) {
+            for (y in imageHeight - 1 downTo 0) {
+                yuv[i] = data[y * imageWidth + x]
+                i++
+            }
+        }
+        // Rotate the U and V color components
+        i = imageWidth * imageHeight * 3 / 2 - 1
+        var x = imageWidth - 1
+        while (x > 0) {
+            for (y in 0 until imageHeight / 2) {
+                yuv[i] = data[imageWidth * imageHeight + y * imageWidth + x]
+                i--
+                yuv[i] = data[imageWidth * imageHeight + y * imageWidth + (x - 1)]
+                i--
+            }
+            x -= 2
+        }
+        return yuv
     }
 
     fun yuv420888toNV21(image: Image): ByteArray? {
