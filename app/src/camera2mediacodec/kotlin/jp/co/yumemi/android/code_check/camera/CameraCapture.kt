@@ -12,6 +12,7 @@ import android.util.Log
 import android.util.SparseIntArray
 import android.view.Surface
 import dagger.hilt.android.qualifiers.ActivityContext
+import jp.co.yumemi.android.code_check.utils.YUVUtil
 import java.nio.ByteBuffer
 import java.util.*
 import javax.inject.Inject
@@ -51,6 +52,12 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     fun stopBackgroundThread() {
         backgroundHandlerThread.quitSafely()
         backgroundHandlerThread.join()
+    }
+
+    //关闭相机
+    fun closeCamera() {
+        cameraDevice.close()
+        cameraCaptureSession.close()
     }
 
     /**
@@ -110,11 +117,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
                     captureDataReader.setOnImageAvailableListener(
                         onCaptureImageAvailableListener, backgroundHandler
                     )
-
-
                 }
             cameraId = id
-
         }
     }
 
@@ -123,7 +127,7 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
      */
     private val onPreviewImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
         val image: Image = reader.acquireNextImage()
-        yuv420888toNV21(image)?.let {
+        YUVUtil.yuv420888toNV12(image).let {
             this.cameraDataListener?.previewNV21DataListener(it)
         }
         image.close()
@@ -182,27 +186,6 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     @SuppressLint("MissingPermission")
     fun connectCamera() {
         cameraManager.openCamera(cameraId, cameraStateCallback, backgroundHandler)
-    }
-
-    private var yBuffer: ByteBuffer? = null
-    private var uBuffer: ByteBuffer? = null
-    private var vBuffer: ByteBuffer? = null
-
-    private fun yuv420888toNV21(image: Image): ByteArray? {
-        val nv21: ByteArray
-        yBuffer = image.planes[0].buffer
-        uBuffer = image.planes[1].buffer
-        vBuffer = image.planes[2].buffer
-        val ySize = yBuffer!!.remaining()
-        val uSize = uBuffer!!.remaining()
-        val vSize = vBuffer!!.remaining()
-        nv21 = ByteArray(ySize + uSize + vSize)
-
-        //U and V are swapped
-        yBuffer!![nv21, 0, ySize]
-        vBuffer!![nv21, ySize, vSize]
-        uBuffer!![nv21, ySize + vSize, uSize]
-        return nv21
     }
 
 }

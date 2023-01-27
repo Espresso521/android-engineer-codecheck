@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.camera.CameraCapture
 import jp.co.yumemi.android.code_check.camera.ICameraDataListener
+import jp.co.yumemi.android.code_check.codec.VideoEncoder
 import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
 import java.util.*
 import javax.inject.Inject
@@ -39,6 +40,9 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
 
     @Inject
     lateinit var capture: CameraCapture
+
+    @Inject
+    lateinit var videoEncoder: VideoEncoder
 
     private lateinit var binding: ActivityCameraBinding
 
@@ -67,9 +71,14 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
         shouldProceedWithOnResume = !shouldProceedWithOnResume
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         capture.stopBackgroundThread()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        capture.closeCamera()
     }
 
     private fun wasCameraPermissionWasGiven(): Boolean {
@@ -158,5 +167,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
     override fun previewNV21DataListener(data: ByteArray) {
         // TODO: add to LinkedBlockingQueue for produce and consume
     }
+
+    fun startRecord(view: View) {}
+    fun stopRecord(view: View) {}
 
 }
