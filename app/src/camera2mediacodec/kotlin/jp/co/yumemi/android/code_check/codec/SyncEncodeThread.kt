@@ -9,6 +9,8 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.ByteBuffer
+import java.util.concurrent.LinkedBlockingQueue
 import javax.inject.Inject
 
 class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Context) : Thread() {
@@ -19,41 +21,54 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
     private var outputStream: BufferedOutputStream? = null
     var mIsEncoding = false
 
+    private lateinit var encoderDataBuffer: LinkedBlockingQueue<ByteArray>
+
     init {
         createFile()
     }
 
-    var mCodeC: MediaCodec? = null
+    private lateinit var mCodeC: MediaCodec
 
     companion object {
         private const val TAG = "SyncEncodeThread"
     }
 
-    fun init(mCodeC: MediaCodec) {
+    fun init(mCodeC: MediaCodec, buffer: LinkedBlockingQueue<ByteArray>) {
         this.mCodeC = mCodeC
+        this.encoderDataBuffer = buffer
     }
 
     override fun run() {
         super.run()
 
         val bufferInfo = MediaCodec.BufferInfo()
-        while (mIsEncoding) {//当处于正在编码时进行循环读取数据
-            var outputIndex = mCodeC!!.dequeueOutputBuffer(bufferInfo, 10_000)
+        while (mIsEncoding) {
+
+            val data = encoderDataBuffer.take()
+            val inputBufferIndex = mCodeC.dequeueInputBuffer(10_000)
+            if (inputBufferIndex >= 0) {
+                val inputBuffer : ByteBuffer? = mCodeC.getInputBuffer(inputBufferIndex)
+                inputBuffer?.clear()
+                inputBuffer?.put(data)
+                mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, 0, 0)
+            }
+
+            var outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 10_000)
             if (outputIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                Log.e(TAG, "MediaCodec.INFO_TRY_AGAIN_LATER ???")
+                sleep(10)
             } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {//当编码器开始返回数据开始
                 //获取数据的配置头信息
-                var byteBuffer = mCodeC!!.outputFormat.getByteBuffer("csd-0")
+                var byteBuffer = mCodeC.outputFormat.getByteBuffer("csd-0")
                 mVideoSps = ByteArray(byteBuffer!!.remaining())
                 byteBuffer.get(mVideoSps, 0, mVideoSps.size)
 
-                byteBuffer = mCodeC!!.outputFormat.getByteBuffer("csd-1")
+                byteBuffer = mCodeC.outputFormat.getByteBuffer("csd-1")
                 mVideoPps = ByteArray(byteBuffer!!.remaining())
                 byteBuffer.get(mVideoPps, 0, mVideoPps.size)
             } else if (outputIndex > 0) {//图像数据流到达
                 var singleData = byteArrayOf()
                 while (outputIndex >= 0) {//循环读取
-                    val outputBuffer = mCodeC!!.getOutputBuffer(outputIndex)
+                    val outputBuffer = mCodeC.getOutputBuffer(outputIndex)
                     val outData = ByteArray(bufferInfo.size)
                     outputBuffer!!.get(outData)//读取数据到buffer
                     if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
@@ -80,8 +95,8 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
                             byteMerger(singleData, outData)
                         }
                     }
-                    mCodeC!!.releaseOutputBuffer(outputIndex, false)
-                    outputIndex = mCodeC!!.dequeueOutputBuffer(bufferInfo, 1_000)
+                    mCodeC.releaseOutputBuffer(outputIndex, false)
+                    outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 1_000)
                     try {
                         outputStream!!.write(singleData, 0, singleData.size)
                     } catch (e: IOException) {
@@ -91,11 +106,8 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
 
             }
         }
-        //结束，释放资源
-        mCodeC!!.signalEndOfInputStream()
-        mCodeC!!.stop()
-        mCodeC!!.release()
-        mCodeC = null
+        mCodeC.stop()
+        mCodeC.release()
         outputStream?.flush()
         outputStream?.close()
     }

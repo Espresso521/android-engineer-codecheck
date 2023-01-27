@@ -34,7 +34,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private lateinit var captureDataReader: ImageReader
     private lateinit var previewSurface: Surface
     private var jpegOrientation: Int = 0
-    private var cameraDataListener: ICameraDataListener? = null
+    private var cameraPreviewDataListener: ICameraPreviewDataListener? = null
+    private var cameraTakePhotoListener: ICameraTakePhotoListener? = null
 
     private var orientations: SparseIntArray = SparseIntArray(4).apply {
         append(Surface.ROTATION_0, 90)
@@ -81,9 +82,14 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         }
     }
 
-    fun setupCamera(previewSurface: Surface, cameraDataListener: ICameraDataListener) {
+    fun setupCamera(
+        previewSurface: Surface,
+        cameraDataListener: ICameraPreviewDataListener? = null,
+        cameraTakePhotoListener: ICameraTakePhotoListener? = null,
+    ) {
         this.previewSurface = previewSurface
-        this.cameraDataListener = cameraDataListener
+        this.cameraPreviewDataListener = cameraDataListener
+        this.cameraTakePhotoListener = cameraTakePhotoListener
         val cameraIds: Array<String> = cameraManager.cameraIdList
 
         for (id in cameraIds) {
@@ -127,8 +133,8 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
      */
     private val onPreviewImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
         val image: Image = reader.acquireNextImage()
-        YUVUtil.yuv420888toNV12(image).let {
-            this.cameraDataListener?.previewNV21DataListener(it)
+        YUVUtil.yuv420888toNV12(image)?.let {
+            this.cameraPreviewDataListener?.previewNV12DataListener(it)
         }
         image.close()
     }
@@ -141,7 +147,7 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
         buffer.rewind()
         val data = ByteArray(buffer.capacity())
         buffer[data]
-        this.cameraDataListener?.takePhotoDataListener(jpegOrientation, data)
+        this.cameraTakePhotoListener?.takePhotoDataListener(jpegOrientation, data)
         image.close()
     }
 

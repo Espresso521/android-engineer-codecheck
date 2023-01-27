@@ -23,14 +23,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.camera.CameraCapture
-import jp.co.yumemi.android.code_check.camera.ICameraDataListener
+import jp.co.yumemi.android.code_check.camera.ICameraTakePhotoListener
 import jp.co.yumemi.android.code_check.codec.VideoEncoder
 import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataListener {
+class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTakePhotoListener {
 
     private val TAG = CameraActivity::class.simpleName
 
@@ -64,7 +64,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
         super.onResume()
         capture.startBackgroundThread()
         if (binding.surfaceView.isActivated && shouldProceedWithOnResume) {
-            binding.surfaceView.holder.surface?.let { capture.setupCamera(it, this@CameraActivity) }
+            binding.surfaceView.holder.surface?.let { capture.setupCamera(it, videoEncoder, this@CameraActivity) }
         } else if (!binding.surfaceView.isActivated) {
             binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         }
@@ -130,8 +130,9 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
     private val surfaceViewCallBack = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             if (wasCameraPermissionWasGiven()) {
-                capture.setupCamera(holder.surface, this@CameraActivity)
+                capture.setupCamera(holder.surface, videoEncoder, this@CameraActivity)
                 capture.connectCamera()
+                videoEncoder.initConfig(1920, 1080)
             }
         }
 
@@ -149,6 +150,13 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
         capture.takePhoto(windowManager.defaultDisplay.rotation)
     }
 
+    fun startRecord(view: View) {
+        videoEncoder.start()
+    }
+    fun stopRecord(view: View) {
+        videoEncoder.stop()
+    }
+
     override fun takePhotoDataListener(orientation: Int, data: ByteArray) {
         var bitmap: Bitmap? = BitmapFactory.decodeByteArray(data, 0, data.size) ?: return
 
@@ -163,12 +171,5 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraDataL
             it.post { it.setImageBitmap(bitmap) }
         }
     }
-
-    override fun previewNV21DataListener(data: ByteArray) {
-        // TODO: add to LinkedBlockingQueue for produce and consume
-    }
-
-    fun startRecord(view: View) {}
-    fun stopRecord(view: View) {}
 
 }
