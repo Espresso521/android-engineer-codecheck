@@ -4,28 +4,26 @@ import android.content.Context
 import android.media.MediaCodec
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import jp.co.yumemi.android.code_check.data.EncodeDecodeDataRepo
 import jp.co.yumemi.android.code_check.utils.FileUtils
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
-import java.util.concurrent.LinkedBlockingQueue
 import javax.inject.Inject
 
-class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Context) : Thread() {
+class SyncEncodeThread @Inject constructor(
+    @ApplicationContext val context: Context,
+    var encodeDecodeDataRepo: EncodeDecodeDataRepo
+) : Thread() {
 
-    var configByte: ByteArray? = null
+    private var configByte: ByteArray? = null
     lateinit var mVideoSps: ByteArray
     lateinit var mVideoPps: ByteArray
     private var outputStream: BufferedOutputStream? = null
     var mIsEncoding = false
-
-    private lateinit var encoderDataBuffer: LinkedBlockingQueue<ByteArray>
-
-    init {
-        createFile()
-    }
+    var needSaveFile = false
 
     private lateinit var mCodeC: MediaCodec
 
@@ -33,9 +31,8 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
         private const val TAG = "SyncEncodeThread"
     }
 
-    fun init(mCodeC: MediaCodec, buffer: LinkedBlockingQueue<ByteArray>) {
+    fun init(mCodeC: MediaCodec) {
         this.mCodeC = mCodeC
-        this.encoderDataBuffer = buffer
     }
 
     override fun run() {
@@ -44,10 +41,10 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
         val bufferInfo = MediaCodec.BufferInfo()
         while (mIsEncoding) {
 
-            val data = encoderDataBuffer.take()
+            val data = encodeDecodeDataRepo.getCameraPreviewData()
             val inputBufferIndex = mCodeC.dequeueInputBuffer(10_000)
             if (inputBufferIndex >= 0) {
-                val inputBuffer : ByteBuffer? = mCodeC.getInputBuffer(inputBufferIndex)
+                val inputBuffer: ByteBuffer? = mCodeC.getInputBuffer(inputBufferIndex)
                 inputBuffer?.clear()
                 inputBuffer?.put(data)
                 mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, 0, 0)
@@ -56,7 +53,7 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
             var outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 10_000)
             if (outputIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 sleep(10)
-            } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {//当编码器开始返回数据开始
+            } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 //获取数据的配置头信息
                 var byteBuffer = mCodeC.outputFormat.getByteBuffer("csd-0")
                 mVideoSps = ByteArray(byteBuffer!!.remaining())
@@ -97,13 +94,9 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
                     }
                     mCodeC.releaseOutputBuffer(outputIndex, false)
                     outputIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 1_000)
-                    try {
-                        outputStream!!.write(singleData, 0, singleData.size)
-                    } catch (e: IOException) {
-                        Log.e(TAG, "IOException : " + e.printStackTrace())
-                    }
                 }
-
+                encodeDecodeDataRepo.h264EncodeDataListener(singleData)
+                saveToFile(singleData)
             }
         }
         mCodeC.stop()
@@ -120,6 +113,24 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
         mIsEncoding = false
     }
 
+    fun enableFileSave(saveFile: Boolean) {
+        this.needSaveFile = saveFile
+
+        if (saveFile) {
+            createFile()
+        }
+    }
+
+    private fun saveToFile(singleData: ByteArray) {
+        if (needSaveFile) {
+            try {
+                outputStream!!.write(singleData, 0, singleData.size)
+            } catch (e: IOException) {
+                Log.e(TAG, "IOException : " + e.printStackTrace())
+            }
+        }
+    }
+
     private fun byteMerger(bt1: ByteArray, bt2: ByteArray): ByteArray {
         val bt3 = ByteArray(bt1.size + bt2.size)
         System.arraycopy(bt1, 0, bt3, 0, bt1.size)
@@ -129,8 +140,7 @@ class SyncEncodeThread @Inject constructor(@ApplicationContext val context: Cont
 
     private fun createFile() {
         val file = File(
-            FileUtils.getFileDir(context),
-            "codec_${System.currentTimeMillis()}.h264"
+            FileUtils.getFileDir(context), "codec_${System.currentTimeMillis()}.h264"
         )
         if (file.exists()) {
             file.delete()

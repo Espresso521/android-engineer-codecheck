@@ -64,7 +64,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
         super.onResume()
         capture.startBackgroundThread()
         if (binding.surfaceView.isActivated && shouldProceedWithOnResume) {
-            binding.surfaceView.holder.surface?.let { capture.setupCamera(it, videoEncoder, this@CameraActivity) }
+            binding.surfaceView.holder.surface?.let { capture.setupCamera(it, this@CameraActivity) }
         } else if (!binding.surfaceView.isActivated) {
             binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         }
@@ -130,7 +130,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
     private val surfaceViewCallBack = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             if (wasCameraPermissionWasGiven()) {
-                capture.setupCamera(holder.surface, videoEncoder, this@CameraActivity)
+                capture.setupCamera(holder.surface, this@CameraActivity)
                 capture.connectCamera()
                 videoEncoder.initConfig(1920, 1080)
             }

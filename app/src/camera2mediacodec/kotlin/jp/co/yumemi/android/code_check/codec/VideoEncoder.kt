@@ -4,24 +4,16 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.util.Log
-import jp.co.yumemi.android.code_check.camera.ICameraPreviewDataListener
-import java.util.concurrent.LinkedBlockingQueue
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class VideoEncoder @Inject constructor() : ICameraPreviewDataListener {
+class VideoEncoder @Inject constructor(var syncEncodeThread: SyncEncodeThread) {
 
     private val TAG = VideoEncoder::class.simpleName
 
-    @Inject
-    lateinit var syncEncodeThread: SyncEncodeThread
-
     private var mCodeC: MediaCodec? = null
     private lateinit var mVideoFormat: MediaFormat
-
-    // buffer 1 seconds data
-    var nv12buffer = LinkedBlockingQueue<ByteArray>(25)
 
     /**
      * 初始化配置参数
@@ -43,7 +35,7 @@ class VideoEncoder @Inject constructor() : ICameraPreviewDataListener {
         //此处不能用mOutputSurface，会configure失败
         mCodeC!!.configure(mVideoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         mCodeC!!.start()
-        syncEncodeThread.init(mCodeC!!, nv12buffer)
+        syncEncodeThread.init(mCodeC!!)
         Log.e(TAG, "Encoder codec started!")
     }
 
@@ -54,14 +46,6 @@ class VideoEncoder @Inject constructor() : ICameraPreviewDataListener {
 
     fun stop() {
         syncEncodeThread.stopEncode()
-    }
-
-    override fun previewNV21DataListener(data: ByteArray) {
-        // TODO: add to LinkedBlockingQueue for produce and consume
-    }
-
-    override fun previewNV12DataListener(data: ByteArray) {
-        nv12buffer.offer(data)
     }
 
 }

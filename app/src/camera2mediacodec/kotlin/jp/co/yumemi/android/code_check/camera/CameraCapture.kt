@@ -12,13 +12,17 @@ import android.util.Log
 import android.util.SparseIntArray
 import android.view.Surface
 import dagger.hilt.android.qualifiers.ActivityContext
+import jp.co.yumemi.android.code_check.data.EncodeDecodeDataRepo
 import jp.co.yumemi.android.code_check.utils.YUVUtil
 import java.nio.ByteBuffer
 import java.util.*
 import javax.inject.Inject
 
 
-class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
+class CameraCapture @Inject constructor(
+    @ActivityContext val context: Context,
+    var encodeDecodeDataRepo: EncodeDecodeDataRepo
+) {
 
     private val TAG = CameraCapture::class.simpleName
 
@@ -34,7 +38,6 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private lateinit var captureDataReader: ImageReader
     private lateinit var previewSurface: Surface
     private var jpegOrientation: Int = 0
-    private var cameraPreviewDataListener: ICameraPreviewDataListener? = null
     private var cameraTakePhotoListener: ICameraTakePhotoListener? = null
 
     private var orientations: SparseIntArray = SparseIntArray(4).apply {
@@ -84,11 +87,9 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
 
     fun setupCamera(
         previewSurface: Surface,
-        cameraDataListener: ICameraPreviewDataListener? = null,
         cameraTakePhotoListener: ICameraTakePhotoListener? = null,
     ) {
         this.previewSurface = previewSurface
-        this.cameraPreviewDataListener = cameraDataListener
         this.cameraTakePhotoListener = cameraTakePhotoListener
         val cameraIds: Array<String> = cameraManager.cameraIdList
 
@@ -134,7 +135,7 @@ class CameraCapture @Inject constructor(@ActivityContext val context: Context) {
     private val onPreviewImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
         val image: Image = reader.acquireNextImage()
         YUVUtil.yuv420888toNV12(image)?.let {
-            this.cameraPreviewDataListener?.previewNV12DataListener(it)
+            encodeDecodeDataRepo.previewNV12DataListener(it)
         }
         image.close()
     }
