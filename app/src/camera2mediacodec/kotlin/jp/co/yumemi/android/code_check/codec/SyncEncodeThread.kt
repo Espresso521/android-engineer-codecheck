@@ -65,34 +65,38 @@ class SyncEncodeThread @Inject constructor(
                 byteBuffer = mCodeC.outputFormat.getByteBuffer("csd-1")
                 mVideoPps = ByteArray(byteBuffer!!.remaining())
                 byteBuffer.get(mVideoPps, 0, mVideoPps.size)
-            } else if (outputIndex > 0) {//图像数据流到达
+            } else if (outputIndex >= 0) {//图像数据流到达
                 var singleData = byteArrayOf()
-                while (outputIndex >= 0) {//循环读取
+                while (outputIndex >= 0) {
                     val outputBuffer = mCodeC.getOutputBuffer(outputIndex)
                     val outData = ByteArray(bufferInfo.size)
                     outputBuffer!!.get(outData)//读取数据到buffer
-                    if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
-                        configByte = ByteArray(bufferInfo.size)
-                        configByte = outData
-                    } else if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
-                        if (configByte == null || configByte!!.isEmpty()) {
+                    when (bufferInfo.flags) {
+                        MediaCodec.BUFFER_FLAG_CODEC_CONFIG -> {
+                            configByte = ByteArray(bufferInfo.size)
                             configByte = outData
                         }
-                        val head = byteMerger(mVideoSps, mVideoPps)
-                        var keyframe = ByteArray(bufferInfo.size + configByte!!.size)
-                        configByte = byteMerger(head, configByte!!)
-                        val out = byteMerger(configByte!!, outData)
-                        keyframe = byteMerger(out, keyframe)
-                        if (singleData.isEmpty()) {
-                            singleData = keyframe
-                        } else {
-                            singleData = byteMerger(singleData, keyframe)
+                        MediaCodec.BUFFER_FLAG_KEY_FRAME -> {
+                            if (configByte == null || configByte!!.isEmpty()) {
+                                configByte = outData
+                            }
+                            val head = byteMerger(mVideoSps, mVideoPps)
+                            var keyframe = ByteArray(bufferInfo.size + configByte!!.size)
+                            configByte = byteMerger(head, configByte!!)
+                            val out = byteMerger(configByte!!, outData)
+                            keyframe = byteMerger(out, keyframe)
+                            singleData = if (singleData.isEmpty()) {
+                                keyframe
+                            } else {
+                                byteMerger(singleData, keyframe)
+                            }
                         }
-                    } else {
-                        singleData = if (singleData.isEmpty()) {
-                            outData
-                        } else {
-                            byteMerger(singleData, outData)
+                        else -> {
+                            singleData = if (singleData.isEmpty()) {
+                                outData
+                            } else {
+                                byteMerger(singleData, outData)
+                            }
                         }
                     }
                     mCodeC.releaseOutputBuffer(outputIndex, false)

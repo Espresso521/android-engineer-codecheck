@@ -38,6 +38,7 @@ object YUVUtil {
         uBuffer!!.get(nv12, ySize, uSize)
 
         rotateYUV420Degree90(nv12!!, image.width, image.height)
+        //return mirrorYUV420(nv12rotate90!!, image.height, image.width)
         return nv12rotate90
     }
 
@@ -45,7 +46,7 @@ object YUVUtil {
         data: ByteArray,
         imageWidth: Int,
         imageHeight: Int
-    ): ByteArray? {
+    ) {
         val yuv = nv12rotate90!!
         // Rotate the Y luma
         var i = 0
@@ -67,7 +68,51 @@ object YUVUtil {
             }
             x -= 2
         }
-        return yuv
+    }
+
+    fun mirrorYUV420(data: ByteArray, width: Int, height: Int): ByteArray {
+
+        var startPos: Int = 0
+        var left: Int = 0
+        var right: Int = 0
+        var temp: Byte
+
+        for (i in 0 until height) {
+            left = startPos
+            right = startPos + width -1
+            while(left < right) {
+                temp = data[left]
+                data[left] = data[right]
+                data[right] = temp
+                left++
+                right--
+            }
+            startPos += width
+        }
+
+        val offset = width * height
+        startPos = 0
+
+        for (i in 0 until height/2) {
+            left = offset + startPos
+            right = offset + startPos + width - 2
+            while (left < right) {
+                temp = data[left]
+                data[left] = data[right]
+                data[right] = temp
+                left++
+                right--
+
+                temp = data[left]
+                data[left] = data[right]
+                data[right] = temp
+                left++
+                right--
+            }
+            startPos += width
+        }
+
+        return data
     }
 
     fun yuv420888toNV21(image: Image): ByteArray? {
