@@ -10,14 +10,9 @@
 
 <img src="docs/app.gif" width="320">
 
-### 環境
+僕のCamera２MediaCodecの効果
 
-- IDE：Android Studio Arctic Fox | 2020.3.1 Patch 1
-- Kotlin：1.5.31
-- Java：11
-- Gradle：7.0.1
-- minSdk：23
-- targetSdk：31
+<img src="docs/camera2mediacodec.gif" width="320">
 
 ※ ライブラリの利用はオープンソースのものに限ります。
 
