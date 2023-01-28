@@ -7,21 +7,11 @@
     <application
         android:allowBackup="true"
         android:name="jp.co.yumemi.android.code_check.SearchApplication"
-        android:icon="@mipmap/github_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/github_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidEngineerCodeCheck"
         android:fullBackupContent="@xml/backup_descriptor">
-        <activity
-            android:name="jp.co.yumemi.android.code_check.CameraActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

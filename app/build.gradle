@@ -47,6 +47,7 @@ android {
 
         camera2mediacodec{
             dimension "HUZE"
+            applicationId "jp.kotaku.camera.mediacodec"
         }
     }
 }

@@ -11,9 +11,9 @@
     <application
         android:allowBackup="true"
         android:name="jp.co.yumemi.android.code_check.SearchApplication"
-        android:icon="@mipmap/github_icon"
+        android:icon="@mipmap/camera_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/github_icon"
+        android:roundIcon="@mipmap/camera_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidEngineerCodeCheck"
         android:fullBackupContent="@xml/backup_descriptor">
