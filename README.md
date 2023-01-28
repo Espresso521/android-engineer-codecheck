@@ -10,11 +10,13 @@
 
 <img src="docs/app.gif" width="320">
 
+僕のGitHub のリポジトリを検索するアプリ
+
+<img src="docs/githubRepoSearch.gif" width="320">
+
 僕のCamera２MediaCodecの効果
 
 <img src="docs/camera2mediacodec.gif" width="320">
-
-※ ライブラリの利用はオープンソースのものに限ります。
 
 ### 動作
 
