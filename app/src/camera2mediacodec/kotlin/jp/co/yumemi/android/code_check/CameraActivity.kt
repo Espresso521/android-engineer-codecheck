@@ -73,6 +73,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         binding.verticalMirrorSwitch.setOnCheckedChangeListener { _, isChecked ->
             YUVUtil.isMirrorVertical = isChecked
         }
+        binding.saveH264Frame.setOnCheckedChangeListener { _, isChecked ->
+            videoEncoder.enableH264Save(isChecked)
+            videoDecoder.enableH264Save(isChecked)
+            if(isChecked) binding.saveH264FrameText.visibility = View.VISIBLE
+            else binding.saveH264FrameText.visibility = View.GONE
+        }
         binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 capture.handleZoom(progress)

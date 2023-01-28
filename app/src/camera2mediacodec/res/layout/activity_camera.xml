@@ -92,6 +92,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/horizontalMirrorSwitch" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/saveH264Frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Save H264 Frame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/verticalMirrorSwitch" />
+
+    <TextView
+        android:id="@+id/saveH264FrameText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:layout_marginStart="11dp"
+        android:visibility="gone"
+        android:text="Save H264 Data to /sdcard/Android/data/{applicationId}/files"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideVertical"
+        app:layout_constraintTop_toBottomOf="@id/saveH264Frame" />
+
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/zoomSeekbar"
         android:layout_width="0dp"

@@ -38,7 +38,6 @@ class VideoEncoder @Inject constructor(var syncEncodeThread: SyncEncodeThread) {
     }
 
     fun start() {
-        //syncEncodeThread.enableFileSave(true)
         syncEncodeThread.startEncode()
         syncEncodeThread.start()
     }
@@ -57,6 +56,10 @@ class VideoEncoder @Inject constructor(var syncEncodeThread: SyncEncodeThread) {
 
     fun isPaused() : Boolean {
         return syncEncodeThread.isPause
+    }
+
+    fun enableH264Save(isSave : Boolean) {
+        syncEncodeThread.enableFileSave(isSave)
     }
 
 }

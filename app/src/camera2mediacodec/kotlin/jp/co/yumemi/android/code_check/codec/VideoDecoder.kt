@@ -25,13 +25,16 @@ class VideoDecoder @Inject constructor(var syncDecodeThread: SyncDecodeThread) {
     }
 
     fun start() {
-        //syncDecodeThread.enableFileSave(true)
         syncDecodeThread.startDecode()
         syncDecodeThread.start()
     }
 
     fun stop() {
         syncDecodeThread.stopDecode()
+    }
+
+    fun enableH264Save(isSave : Boolean) {
+        syncDecodeThread.enableFileSave(isSave)
     }
 
 }
