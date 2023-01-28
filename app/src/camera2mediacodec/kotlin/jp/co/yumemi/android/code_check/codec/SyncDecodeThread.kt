@@ -71,6 +71,10 @@ class SyncDecodeThread @Inject constructor(
 
     fun stopDecode() {
         isDecoding = false
+        mCodeC.stop()
+        mCodeC.release()
+        outputStream?.flush()
+        outputStream?.close()
     }
 
     fun enableFileSave(saveFile: Boolean) {

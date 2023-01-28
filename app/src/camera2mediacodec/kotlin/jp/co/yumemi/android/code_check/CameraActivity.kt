@@ -69,7 +69,6 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         }
         binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                Log.e("huze", "progerss is $progress")
                 capture.handleZoom(progress)
             }
 
