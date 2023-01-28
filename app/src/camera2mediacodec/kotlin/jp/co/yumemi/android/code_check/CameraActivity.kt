@@ -29,6 +29,7 @@ import jp.co.yumemi.android.code_check.camera.ICameraTakePhotoListener
 import jp.co.yumemi.android.code_check.codec.VideoDecoder
 import jp.co.yumemi.android.code_check.codec.VideoEncoder
 import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
+import jp.co.yumemi.android.code_check.utils.YUVUtil
 import java.util.*
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
 
     val CAMERA_REQUEST_RESULT = 1
 
-    private var shouldProceedWithOnResume: Boolean = true
+    private var isEncodeSurfaceviewCreated: Boolean = false
 
     @Inject
     lateinit var capture: CameraCapture
@@ -62,12 +63,17 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
             requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_RESULT)
         }
         binding.surfaceView.holder.addCallback(surfaceViewCallBack)
-        binding.surfaceViewDecode.holder.addCallback(decodeSurfaceViewCallBack)
         binding.codecSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) startEncode()
-            else stopEncode()
+            else pauseEncode()
         }
-        binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener{
+        binding.horizontalMirrorSwitch.setOnCheckedChangeListener { _, isChecked ->
+            YUVUtil.isMirrorHorizontal = isChecked
+        }
+        binding.verticalMirrorSwitch.setOnCheckedChangeListener { _, isChecked ->
+            YUVUtil.isMirrorVertical = isChecked
+        }
+        binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 capture.handleZoom(progress)
             }
@@ -78,29 +84,23 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
             override fun onStopTrackingTouch(seekBar: SeekBar?) {//
             }
         })
-        capture.startBackgroundThread()
     }
 
     @SuppressLint("MissingPermission")
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         capture.startBackgroundThread()
-        if (binding.surfaceView.isActivated && shouldProceedWithOnResume) {
-            binding.surfaceView.holder.surface?.let { capture.setupCamera(it, this@CameraActivity) }
-        } else if (!binding.surfaceView.isActivated) {
-            binding.surfaceView.holder.addCallback(surfaceViewCallBack)
-        }
-        shouldProceedWithOnResume = !shouldProceedWithOnResume
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         capture.stopBackgroundThread()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         capture.closeCamera()
+        stopEncode()
     }
 
     private fun wasCameraPermissionWasGiven(): Boolean {
@@ -121,7 +121,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            if (binding.surfaceView.isActivated) {
+            if (isEncodeSurfaceviewCreated) {
                 surfaceViewCallBack.surfaceCreated(
                     binding.surfaceView.holder
                 )
@@ -151,10 +151,10 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
      */
     private val surfaceViewCallBack = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
+            isEncodeSurfaceviewCreated = true
             if (wasCameraPermissionWasGiven()) {
                 capture.setupCamera(holder.surface, this@CameraActivity)
                 capture.connectCamera()
-                videoEncoder.initConfig(1920, 1080)
             }
         }
 
@@ -163,24 +163,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
+            isEncodeSurfaceviewCreated = false
             Log.e("CameraActivity", "Encode SurfaceView Destroyed")
-        }
-
-    }
-
-    private val decodeSurfaceViewCallBack = object : SurfaceHolder.Callback {
-        override fun surfaceCreated(holder: SurfaceHolder) {
-            if (wasCameraPermissionWasGiven()) {
-                videoDecoder.initConfig(1080, 1920, holder.surface)
-            }
-        }
-
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Log.e("CameraActivity", "Decode surface view width is $width, height is $height")
-        }
-
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Log.e("CameraActivity", "Decode SurfaceView Destroyed")
         }
 
     }
@@ -190,8 +174,20 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
     }
 
     private fun startEncode() {
-        videoEncoder.start()
-        videoDecoder.start()
+        if (videoEncoder.isPaused()) {
+            videoEncoder.onResume()
+        } else {
+            if (isEncodeSurfaceviewCreated) {
+                videoEncoder.initConfig(1920, 1080)
+                videoDecoder.initConfig(1080, 1920, binding.surfaceViewDecode.holder.surface)
+                videoEncoder.start()
+                videoDecoder.start()
+            }
+        }
+    }
+
+    private fun pauseEncode() {
+        videoEncoder.onPause()
     }
 
     private fun stopEncode() {
@@ -205,7 +201,6 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         if (orientation != 0) {
             var matrix = Matrix()
             matrix.postRotate(orientation.toFloat())
-            Log.e(TAG, "jpeg orientation is " + orientation.toFloat())
             bitmap =
                 bitmap?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
         }

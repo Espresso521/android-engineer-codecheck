@@ -47,4 +47,16 @@ class VideoEncoder @Inject constructor(var syncEncodeThread: SyncEncodeThread) {
         syncEncodeThread.stopEncode()
     }
 
+    fun onPause() {
+        syncEncodeThread.isPause = true
+    }
+
+    fun onResume() {
+        syncEncodeThread.isPause = false
+    }
+
+    fun isPaused() : Boolean {
+        return syncEncodeThread.isPause
+    }
+
 }

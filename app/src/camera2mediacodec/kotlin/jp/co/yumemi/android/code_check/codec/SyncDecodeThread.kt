@@ -19,7 +19,7 @@ class SyncDecodeThread @Inject constructor(
 ) : Thread() {
 
     companion object {
-        var frameCount : Long = 1
+        var frameCount: Long = 1
     }
 
     private val TAG = SyncDecodeThread::class.simpleName
@@ -39,30 +39,36 @@ class SyncDecodeThread @Inject constructor(
         super.run()
 
         val bufferInfo = MediaCodec.BufferInfo()
-        var byteBuffer : ByteBuffer?
+        var byteBuffer: ByteBuffer?
 
-        while (isDecoding) {
-            val data = encodeDecodeDataRepo.getCodecEncodeData()
-            saveToFile(data)
-            val inputBufferIndex = mCodeC.dequeueInputBuffer(0)
+        try {
+            while (isDecoding) {
+                val data = encodeDecodeDataRepo.getCodecEncodeData()
+                saveToFile(data)
+                val inputBufferIndex = mCodeC.dequeueInputBuffer(0)
 
-            if (inputBufferIndex >= 0) {
-                byteBuffer = mCodeC.getInputBuffer(inputBufferIndex)
-                byteBuffer?.clear()
-                byteBuffer?.put(data, 0, data.size)
-                mCodeC.queueInputBuffer(inputBufferIndex, 0, data.size, frameCount++ * 1000000 / 30, 0)
+                if (inputBufferIndex >= 0) {
+                    byteBuffer = mCodeC.getInputBuffer(inputBufferIndex)
+                    byteBuffer?.clear()
+                    byteBuffer?.put(data, 0, data.size)
+                    mCodeC.queueInputBuffer(
+                        inputBufferIndex,
+                        0,
+                        data.size,
+                        frameCount++ * 1000000 / 30,
+                        0
+                    )
+                }
+
+                var outIndex: Int = mCodeC.dequeueOutputBuffer(bufferInfo, 0)
+                while (outIndex >= 0) {
+                    mCodeC.releaseOutputBuffer(outIndex, true);
+                    outIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 0);
+                }
             }
-
-            var outIndex: Int = mCodeC.dequeueOutputBuffer(bufferInfo, 0)
-            while (outIndex >= 0) {
-                mCodeC.releaseOutputBuffer(outIndex, true);
-                outIndex = mCodeC.dequeueOutputBuffer(bufferInfo, 0);
-            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        mCodeC.stop()
-        mCodeC.release()
-        outputStream?.flush()
-        outputStream?.close()
     }
 
     fun startDecode() {
