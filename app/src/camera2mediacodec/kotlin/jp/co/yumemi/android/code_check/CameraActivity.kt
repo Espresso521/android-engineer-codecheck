@@ -17,6 +17,8 @@ import android.provider.Settings
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -31,7 +33,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTakePhotoListener {
+class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakePhotoListener {
 
     private val TAG = CameraActivity::class.simpleName
 
@@ -61,6 +63,22 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
         }
         binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         binding.surfaceViewDecode.holder.addCallback(decodeSurfaceViewCallBack)
+        binding.codecSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) startEncode()
+            else stopEncode()
+        }
+        binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                Log.e("huze", "progerss is $progress")
+                capture.handleZoom(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {//
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {//
+            }
+        })
         capture.startBackgroundThread()
     }
 
@@ -172,11 +190,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
         capture.takePhoto(windowManager.defaultDisplay.rotation)
     }
 
-    fun startRecord(view: View) {
+    private fun startEncode() {
         videoEncoder.start()
         videoDecoder.start()
     }
-    fun stopRecord(view: View) {
+
+    private fun stopEncode() {
         videoEncoder.stop()
         videoDecoder.stop()
     }
@@ -188,7 +207,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) , ICameraTake
             var matrix = Matrix()
             matrix.postRotate(orientation.toFloat())
             Log.e(TAG, "jpeg orientation is " + orientation.toFloat())
-            bitmap = bitmap?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
+            bitmap =
+                bitmap?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
         }
 
         binding.captureImgView.let {
