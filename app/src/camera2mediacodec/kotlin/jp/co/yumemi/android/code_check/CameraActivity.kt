@@ -60,12 +60,15 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         setContentView(binding.root)
 
         if (!wasCameraPermissionWasGiven()) {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_RESULT)
+            requestPermissions(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), CAMERA_REQUEST_RESULT)
         }
         binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         binding.codecSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) startEncode()
-            else pauseEncode()
+//            if (isChecked) startEncode()
+//            else pauseEncode()
+
+            if (isChecked) capture.startRecord()
+            else capture.stopRecord()
         }
         binding.horizontalMirrorSwitch.setOnCheckedChangeListener { _, isChecked ->
             YUVUtil.isMirrorHorizontal = isChecked

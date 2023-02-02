@@ -8,6 +8,7 @@ import android.hardware.camera2.*
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.media.Image
 import android.media.ImageReader
+import android.media.MediaRecorder
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
@@ -15,7 +16,10 @@ import android.util.SparseIntArray
 import android.view.Surface
 import dagger.hilt.android.qualifiers.ActivityContext
 import jp.co.yumemi.android.code_check.data.EncodeDecodeDataRepo
+import jp.co.yumemi.android.code_check.utils.FileUtils
 import jp.co.yumemi.android.code_check.utils.YUVUtil
+import java.io.File
+import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.*
 import javax.inject.Inject
@@ -40,6 +44,9 @@ class CameraCapture @Inject constructor(
     private lateinit var captureDataReader: ImageReader // for take photo
     private lateinit var previewSurface: Surface // for UI preview
     private lateinit var previewRequestBuilder: CaptureRequest.Builder
+    private lateinit var recordRequestBuilder: CaptureRequest.Builder
+    private lateinit var currentRequestBuilder: CaptureRequest.Builder
+    private lateinit var mediaRecorder: MediaRecorder
 
     private var jpegOrientation: Int = 0
     private var cameraTakePhotoListener: ICameraTakePhotoListener? = null
@@ -90,7 +97,7 @@ class CameraCapture @Inject constructor(
         mStepHeight = (rect.height() - minHeight) / maxZOOM / 2
     }
 
-    private fun initPreviewRequest() {
+    private fun initPreviewRequestAndStart() {
         previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
         // 设置预览输出的 Surface
         previewRequestBuilder.addTarget(previewSurface) // for surface view
@@ -103,18 +110,36 @@ class CameraCapture @Inject constructor(
         previewRequestBuilder.set(
             CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_AUTO
         )
-    }
 
-    fun startPreview() {
+        currentRequestBuilder = previewRequestBuilder
+
         cameraCaptureSession.setRepeatingRequest(
             previewRequestBuilder.build(), null, backgroundHandler
         )
     }
 
+    fun startPreview() {
+        cameraDevice.createCaptureSession(
+            listOf(previewSurface, previewDataReader.surface, captureDataReader.surface),
+            object : CameraCaptureSession.StateCallback() {
+                override fun onConfigureFailed(session: CameraCaptureSession) {
+                    Log.e(TAG, "capture session onConfigureFailed!!")
+                }
+
+                override fun onConfigured(session: CameraCaptureSession) {
+                    cameraCaptureSession = session
+                    initZoomParameter()
+                    initPreviewRequestAndStart()
+                }
+            },
+            null
+        )
+    }
+
     fun handleZoom(zoom: Int) {
         var mZoom = zoom
-        if(mZoom > maxZOOM) mZoom = maxZOOM
-        if(mZoom <=0) mZoom = 1
+        if (mZoom > maxZOOM) mZoom = maxZOOM
+        if (mZoom <= 0) mZoom = 1
 
         val rect: Rect? =
             cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
@@ -123,33 +148,19 @@ class CameraCapture @Inject constructor(
         val zoomRect =
             Rect(rect!!.left + cropW, rect.top + cropH, rect.right - cropW, rect.bottom - cropH)
 
-        previewRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
+        currentRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
         cameraCaptureSession.stopRepeating()
-        cameraCaptureSession.capture(previewRequestBuilder.build(), object : CaptureCallback() {
+        cameraCaptureSession.capture(currentRequestBuilder.build(), object : CaptureCallback() {
             override fun onCaptureCompleted(
                 session: CameraCaptureSession,
                 request: CaptureRequest,
                 result: TotalCaptureResult
             ) {
-                startPreview()
+                cameraCaptureSession.setRepeatingRequest(
+                    currentRequestBuilder.build(), null, backgroundHandler
+                )
             }
         }, null)
-    }
-
-    /**
-     * Capture State Callback
-     */
-    private val captureSessionStateCallback = object : CameraCaptureSession.StateCallback() {
-        override fun onConfigureFailed(session: CameraCaptureSession) {
-            Log.e(TAG, "capture session onConfigureFailed!!")
-        }
-
-        override fun onConfigured(session: CameraCaptureSession) {
-            cameraCaptureSession = session
-            initZoomParameter()
-            initPreviewRequest()
-            startPreview()
-        }
     }
 
     fun setupCamera(
@@ -217,11 +228,7 @@ class CameraCapture @Inject constructor(
     private val cameraStateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
-            cameraDevice.createCaptureSession(
-                listOf(previewSurface, previewDataReader.surface, captureDataReader.surface),
-                captureSessionStateCallback,
-                null
-            )
+            startPreview()
         }
 
         override fun onDisconnected(cameraDevice: CameraDevice) {
@@ -261,4 +268,79 @@ class CameraCapture @Inject constructor(
         cameraManager.openCamera(cameraId, cameraStateCallback, backgroundHandler)
     }
 
+    private fun setupMediaRecorder() {
+        val file =
+            File(FileUtils.getMediaFileDir(context), "record_${System.currentTimeMillis()}.mp4")
+        mediaRecorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setVideoSource(MediaRecorder.VideoSource.SURFACE)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setOutputFile(file.path)
+            setVideoEncodingBitRate(1024 * 1024 * 1024)
+            setVideoFrameRate(30)
+            setVideoSize(1920, 1080)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+            setOrientationHint(90)
+            try {
+                prepare()
+            } catch (e: IOException) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    fun startRecord() {
+        setupMediaRecorder()
+
+        recordRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD)
+        // 设置预览输出的 Surface
+        recordRequestBuilder.addTarget(mediaRecorder.surface) // for encoder
+        recordRequestBuilder.addTarget(previewSurface) // for surface view
+        // 设置连续自动对焦
+        recordRequestBuilder.set(
+            CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+        )
+        // 设置自动白平衡
+        recordRequestBuilder.set(
+            CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_AUTO
+        )
+
+        currentRequestBuilder = recordRequestBuilder
+
+        cameraCaptureSession.stopRepeating()
+
+        cameraDevice.createCaptureSession(
+            listOf(previewSurface, mediaRecorder.surface),
+            object : CameraCaptureSession.StateCallback() {
+                override fun onConfigureFailed(session: CameraCaptureSession) {
+                    Log.e(TAG, "capture session onConfigureFailed!!")
+                }
+
+                override fun onConfigured(session: CameraCaptureSession) {
+                    cameraCaptureSession = session
+                    cameraCaptureSession.capture(recordRequestBuilder.build(), object : CaptureCallback() {
+                        override fun onCaptureCompleted(
+                            session: CameraCaptureSession,
+                            request: CaptureRequest,
+                            result: TotalCaptureResult
+                        ) {
+                            cameraCaptureSession.setRepeatingRequest(
+                                recordRequestBuilder.build(), null, backgroundHandler
+                            )
+                            mediaRecorder.start()
+                        }
+                    }, null)
+                }
+            },
+            null
+        )
+    }
+
+    fun stopRecord() {
+        mediaRecorder.stop()
+        mediaRecorder.reset()
+        cameraCaptureSession.stopRepeating()
+        startPreview()
+    }
 }
