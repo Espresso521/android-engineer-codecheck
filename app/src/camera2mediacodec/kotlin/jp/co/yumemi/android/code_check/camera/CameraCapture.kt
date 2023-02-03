@@ -255,7 +255,7 @@ class CameraCapture @Inject constructor(
             CaptureRequest.CONTROL_AF_MODE,
             CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE
         )
-        previewRequestBuilder.get(CaptureRequest.SCALER_CROP_REGION)?.let { zoomRect ->
+        currentRequestBuilder.get(CaptureRequest.SCALER_CROP_REGION)?.let { zoomRect ->
             captureRequestBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomRect)
         }
         captureRequestBuilder.addTarget(captureDataReader.surface)
@@ -297,6 +297,7 @@ class CameraCapture @Inject constructor(
         // 设置预览输出的 Surface
         recordRequestBuilder.addTarget(mediaRecorder.surface) // for encoder
         recordRequestBuilder.addTarget(previewSurface) // for surface view
+        previewRequestBuilder.addTarget(previewDataReader.surface) // for encoder
         // 设置连续自动对焦
         recordRequestBuilder.set(
             CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
@@ -311,7 +312,7 @@ class CameraCapture @Inject constructor(
         cameraCaptureSession.stopRepeating()
 
         cameraDevice.createCaptureSession(
-            listOf(previewSurface, mediaRecorder.surface),
+            listOf(previewSurface, mediaRecorder.surface, previewDataReader.surface, captureDataReader.surface),
             object : CameraCaptureSession.StateCallback() {
                 override fun onConfigureFailed(session: CameraCaptureSession) {
                     Log.e(TAG, "capture session onConfigureFailed!!")

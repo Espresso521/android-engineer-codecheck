@@ -11,21 +11,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5"/>
+        app:layout_constraintGuide_percent="0.5" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideVertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"/>
+        app:layout_constraintGuide_percent="0.5" />
 
     <SurfaceView
         android:id="@+id/surfaceView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="9:16"
         app:layout_constraintBottom_toTopOf="@+id/guideHorizontal"
+        app:layout_constraintDimensionRatio="9:16"
         app:layout_constraintEnd_toEndOf="@+id/guideVertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,8 +34,8 @@
         android:id="@+id/surfaceViewDecode"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="9:16"
         app:layout_constraintBottom_toTopOf="@+id/guideHorizontal"
+        app:layout_constraintDimensionRatio="9:16"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideVertical"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,75 +44,99 @@
         android:id="@+id/captureImgView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="9:16"
-        app:layout_constraintTop_toBottomOf="@+id/guideHorizontal"
         app:layout_constraintEnd_toEndOf="@+id/guideVertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/guideHorizontal" />
 
     <ImageView
         android:id="@+id/takePhotoBtn"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/click_button_selector"
         android:onClick="takePhoto"
+        android:src="@drawable/click_button_selector"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideVertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.98" />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/codecSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginTop="5dp"
-        android:text="Encode/Decode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideHorizontal" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/horizontalMirrorSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginTop="5dp"
-        android:text="HorizontalMirror"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/codecSwitch" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/verticalMirrorSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginTop="5dp"
-        android:text="VerticalMirror"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/horizontalMirrorSwitch" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/saveH264Frame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginTop="5dp"
-        android:text="Save H264 Frame"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/verticalMirrorSwitch" />
-
-    <TextView
-        android:id="@+id/saveH264FrameText"
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="11sp"
-        android:layout_marginStart="11dp"
-        android:visibility="gone"
-        android:text="Save H264 Data to /sdcard/Android/data/{applicationId}/files"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/zoomSeekbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideVertical"
-        app:layout_constraintTop_toBottomOf="@id/saveH264Frame" />
+        app:layout_constraintTop_toBottomOf="@id/guideHorizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/recordSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="Video Record" />
+
+            <TextView
+                android:id="@+id/saveMP4Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Video to /sdcard/Android/data/{applicationId}/files/media"
+                android:textSize="11sp"
+                android:visibility="visible" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/codecSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="Encode/Decode" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/horizontalMirrorSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="HorizontalMirror" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/verticalMirrorSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="VerticalMirror" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/saveH264Frame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="Save H264 Frame" />
+
+            <TextView
+                android:id="@+id/saveH264FrameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save H264 Data to /sdcard/Android/data/{applicationId}/files"
+                android:textSize="11sp"
+                android:visibility="visible" />
+        </LinearLayout>
+
+    </ScrollView>
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/zoomSeekbar"
@@ -123,7 +147,7 @@
         android:min="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/takePhotoBtn"
+        app:layout_constraintStart_toEndOf="@+id/guideVertical"
         app:layout_constraintTop_toTopOf="@+id/takePhotoBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
