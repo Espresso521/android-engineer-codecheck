@@ -20,10 +20,12 @@ import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
+import jp.co.yumemi.android.code_check.audio.AudioRecorder
 import jp.co.yumemi.android.code_check.camera.CameraCapture
 import jp.co.yumemi.android.code_check.camera.ICameraTakePhotoListener
 import jp.co.yumemi.android.code_check.codec.VideoDecoder
@@ -51,8 +53,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
     @Inject
     lateinit var videoDecoder: VideoDecoder
 
+    @Inject
+    lateinit var audioRecorder: AudioRecorder
+
     private lateinit var binding: ActivityCameraBinding
 
+    @RequiresPermission(value = "android.permission.RECORD_AUDIO")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,6 +86,10 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         binding.saveH264Frame.setOnCheckedChangeListener { _, isChecked ->
             videoEncoder.enableH264Save(isChecked)
             videoDecoder.enableH264Save(isChecked)
+        }
+        binding.saveG711Data.setOnCheckedChangeListener {_, isChecked ->
+            if(isChecked) audioRecorder.createAudioRecordAndStart()
+            else audioRecorder.stopRecord()
         }
         binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
