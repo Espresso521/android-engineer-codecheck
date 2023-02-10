@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="audio_course_item_seek_bar_progress_height">6dp</dimen>
+    <dimen name="audio_course_item_seek_bar_radius">2dp</dimen>
+    <dimen name="audio_seek_bar_thumb_size">20dp</dimen>
+    <dimen name="audio_seek_bar_thumb_ring_width">4dp</dimen>
+
+</resources>

@@ -19,6 +19,12 @@ class AudioRecorder @Inject constructor(
     @ActivityContext val context: Context
 ) {
 
+    companion object {
+        var pcmFileName : String? = null
+        var g711FileName : String? = null
+
+    }
+
     private val TAG = this::class.simpleName
 
     private var isRecording = false
@@ -38,7 +44,7 @@ class AudioRecorder @Inject constructor(
             AudioFormat.ENCODING_PCM_16BIT
         )
         audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
+            MediaRecorder.AudioSource.VOICE_COMMUNICATION,
             44100,
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT,
@@ -121,6 +127,7 @@ class AudioRecorder @Inject constructor(
             }
             try {
                 outputStream = BufferedOutputStream(FileOutputStream(file))
+                pcmFileName = file.absolutePath
             } catch (e: Exception) {
                 e.printStackTrace()
             }

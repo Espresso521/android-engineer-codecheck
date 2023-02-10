@@ -62,6 +62,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.98" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/audio_play"
+        android:contentDescription="audio play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideHorizontal"
+        android:layout_margin="11dp" />
+
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -161,6 +171,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
+        android:maxHeight="@dimen/audio_course_item_seek_bar_progress_height"
+        android:minHeight="@dimen/audio_course_item_seek_bar_progress_height"
+        android:progressDrawable="@drawable/layers_seek_bar_progress_1"
+        android:thumb="@drawable/shape_thumb_round_1"
         android:max="100"
         android:min="1"
         app:layout_constraintBottom_toBottomOf="parent"

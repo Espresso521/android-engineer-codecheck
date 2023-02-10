@@ -4,28 +4,37 @@
 package jp.co.yumemi.android.code_check
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.RotateDrawable
 import android.hardware.camera2.*
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.TextUtils
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
+import android.view.View.OnClickListener
+import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.audio.AudioRecorder
+import jp.co.yumemi.android.code_check.audio.AudioTracker
 import jp.co.yumemi.android.code_check.camera.CameraCapture
 import jp.co.yumemi.android.code_check.camera.ICameraTakePhotoListener
 import jp.co.yumemi.android.code_check.codec.VideoDecoder
@@ -34,6 +43,7 @@ import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
 import jp.co.yumemi.android.code_check.utils.YUVUtil
 import java.util.*
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakePhotoListener {
@@ -56,7 +66,13 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
     @Inject
     lateinit var audioRecorder: AudioRecorder
 
+    @Inject
+    lateinit var audioTracker: AudioTracker
+
     private lateinit var binding: ActivityCameraBinding
+    private lateinit var rotateThumbDrawable: RotateDrawable
+    private lateinit var solidThumb: Drawable
+    private lateinit var thumbAnimator: ObjectAnimator
 
     @RequiresPermission(value = "android.permission.RECORD_AUDIO")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,8 +81,14 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initSeekBar()
+
         if (!wasCameraPermissionWasGiven()) {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), CAMERA_REQUEST_RESULT)
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO
+                ), CAMERA_REQUEST_RESULT
+            )
         }
         binding.surfaceView.holder.addCallback(surfaceViewCallBack)
         binding.codecSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -87,8 +109,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
             videoEncoder.enableH264Save(isChecked)
             videoDecoder.enableH264Save(isChecked)
         }
-        binding.saveG711Data.setOnCheckedChangeListener {_, isChecked ->
-            if(isChecked) audioRecorder.createAudioRecordAndStart()
+        binding.saveG711Data.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) audioRecorder.createAudioRecordAndStart()
             else audioRecorder.stopRecord()
         }
         binding.zoomSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -102,6 +124,51 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
             override fun onStopTrackingTouch(seekBar: SeekBar?) {//
             }
         })
+        binding.fab.setOnClickListener(object : OnClickListener {
+            override fun onClick(v: View?) {
+                if (binding.saveG711Data.isChecked) {
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Disable [Save PCM/G711 Data] Switch",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
+                if (audioTracker.isPlaying) {
+                    Toast.makeText(
+                        this@CameraActivity, "AudioTrack is Playing Now", Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
+                if (TextUtils.isEmpty(AudioRecorder.pcmFileName)) {
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Enable [Save PCM/G711 Data] Switch to save pcm file first",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
+                audioTracker.createAudioTrackAndPlay()
+            }
+        })
+    }
+
+    private fun initSeekBar() {
+        rotateThumbDrawable = (AppCompatResources.getDrawable(
+            applicationContext, R.drawable.rotate_thumb_1
+        ) as RotateDrawable?)!!
+        solidThumb =
+            AppCompatResources.getDrawable(applicationContext, R.drawable.shape_thumb_round_1)!!
+
+        binding.zoomSeekbar.thumb = rotateThumbDrawable
+        thumbAnimator = ObjectAnimator.ofInt(rotateThumbDrawable, "level", 0, 10000)
+        thumbAnimator.setDuration(1000)
+        thumbAnimator.setRepeatCount(ValueAnimator.INFINITE)
+        thumbAnimator.setInterpolator(LinearInterpolator())
+        thumbAnimator.start()
     }
 
     @SuppressLint("MissingPermission")
@@ -119,24 +186,21 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         super.onDestroy()
         capture.closeCamera()
         stopEncode()
+        thumbAnimator.cancel()
     }
 
     private fun wasCameraPermissionWasGiven(): Boolean {
         return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CAMERA
+            this, Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
+                this, Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             if (isEncodeSurfaceviewCreated) {
@@ -146,14 +210,10 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
             }
         } else {
             Toast.makeText(
-                this,
-                "Camera permission is needed to run this application",
-                Toast.LENGTH_LONG
-            )
-                .show()
+                this, "Camera permission is needed to run this application", Toast.LENGTH_LONG
+            ).show()
             if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.CAMERA
+                    this, Manifest.permission.CAMERA
                 )
             ) {
                 val intent = Intent()
