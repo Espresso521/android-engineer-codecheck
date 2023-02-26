@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import coil.load
+import com.bumptech.glide.Glide
 import jp.co.yumemi.android.code_check.R
 
 object BindingAdapters {
@@ -16,8 +17,9 @@ object BindingAdapters {
     @BindingAdapter("bitmap")
     @JvmStatic
     fun loadBitMap(view: ImageView, bitmap: Bitmap?){
-        bitmap?.let {
-            view.setImageBitmap(it)
-        }
+        Glide.with(view.context).load(bitmap).into(view)
+//        bitmap?.let {
+//            view.load(it)
+//        }
     }
 }
