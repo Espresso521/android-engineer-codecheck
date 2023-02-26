@@ -1,7 +1,6 @@
 package jp.co.yumemi.android.code_check.ui.adapter
 
 import android.app.Activity
-import android.media.MediaMetadataRetriever
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -9,13 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.yumemi.android.code_check.data.Mp4FileMetadata
 import jp.co.yumemi.android.code_check.databinding.FileInfoViewBinding
-import java.io.File
 import javax.inject.Inject
-import kotlin.math.floor
 
 class FileListAdapter @Inject constructor(
     private val fragment: Activity,
-) : ListAdapter<File, RecyclerView.ViewHolder>(FileInfoDiffCB()) {
+) : ListAdapter<Mp4FileMetadata, RecyclerView.ViewHolder>(FileInfoDiffCB()) {
 
     class FileInfoViewHolder(private val binding: FileInfoViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -31,7 +28,7 @@ class FileListAdapter @Inject constructor(
     lateinit var onItemClickListener: OnItemClickListener
 
     interface OnItemClickListener {
-        fun itemClick(fileInfo: File)
+        fun itemClick(filePath: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -47,21 +44,9 @@ class FileListAdapter @Inject constructor(
 
     private fun showFileInfoView(holder: FileInfoViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(getMp4FileMetadata(item), fragment as LifecycleOwner)
+        holder.bind(item, fragment as LifecycleOwner)
         holder.itemView.setOnClickListener {
-            onItemClickListener.itemClick(item)
+            onItemClickListener.itemClick(item.path)
         }
-    }
-
-    private fun getMp4FileMetadata(item: File): Mp4FileMetadata {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(item.path)
-        val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()!! / 1000.0
-        return Mp4FileMetadata(
-            retriever.frameAtTime,
-            item.name,
-            item.path,
-            floor(duration + 0.5).toInt().toString()
-        )
     }
 }
