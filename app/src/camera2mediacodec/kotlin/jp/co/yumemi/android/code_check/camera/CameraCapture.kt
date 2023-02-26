@@ -21,6 +21,7 @@ import jp.co.yumemi.android.code_check.utils.YUVUtil
 import java.io.File
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -269,8 +270,12 @@ class CameraCapture @Inject constructor(
     }
 
     private fun setupMediaRecorder() {
+        val fileName = SimpleDateFormat(
+            "yyyy-MM-dd HH:mm:ss",
+            Locale.JAPAN
+        ).format(Date(System.currentTimeMillis()))
         val file =
-            File(FileUtils.getMediaFileDir(context), "record_${System.currentTimeMillis()}.mp4")
+            File(FileUtils.getMediaFileDir(context), "record_$fileName.mp4")
         mediaRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setVideoSource(MediaRecorder.VideoSource.SURFACE)
