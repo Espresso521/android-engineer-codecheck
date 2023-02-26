@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="jp.co.yumemi.android.code_check.ui.adapter.BindingAdapters" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="fileInfo"
+            type="jp.co.yumemi.android.code_check.data.Mp4FileMetadata" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/fileIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            app:bitmap="@{fileInfo.bitmap}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@mipmap/file_list_icon" />
+
+        <TextView
+            android:id="@+id/fileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:text="@{fileInfo.name}"
+            app:layout_constraintStart_toEndOf="@id/fileIcon"
+            app:layout_constraintTop_toTopOf="@+id/fileIcon"
+            tools:text="2023-02-26-15:15:15.mp4" />
+
+        <TextView
+            android:id="@+id/durationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text='@{"duration: " + fileInfo.duration + "s"}'
+            app:layout_constraintStart_toStartOf="@id/fileName"
+            app:layout_constraintTop_toBottomOf="@id/fileName"
+            tools:text="Time: 5:20" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/dimGray"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

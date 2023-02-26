@@ -27,6 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="jp.co.yumemi.android.code_check.RecordFileListActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

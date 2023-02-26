@@ -154,6 +154,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
                 audioTracker.createAudioTrackAndPlay()
             }
         })
+
+        binding.fabFileList.setOnClickListener(object : OnClickListener {
+            override fun onClick(v: View?) {
+                startActivity(Intent(this@CameraActivity, RecordFileListActivity::class.java))
+            }
+        })
     }
 
     private fun initSeekBar() {
