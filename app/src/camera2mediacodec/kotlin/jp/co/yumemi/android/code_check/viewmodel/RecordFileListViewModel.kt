@@ -29,7 +29,7 @@ class RecordFileListViewModel @Inject constructor(
         }
     }
 
-    private fun getRecordFileList(folder: File?) : List<Mp4FileMetadata> {
+    private fun getRecordFileList(folder: File?): List<Mp4FileMetadata> {
         val fileList = ArrayList<Mp4FileMetadata>()
         folder?.listFiles()?.forEach {
             if (it.name.endsWith(".mp4")) fileList.add(getMp4FileMetadata(it))
@@ -41,14 +41,18 @@ class RecordFileListViewModel @Inject constructor(
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(item.path)
         val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            ?.toLong()!! / 1000.0
+            ?.toLong()!!.div(1000.0)
+        val fps = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toInt()
+            ?.div(duration)?.toInt().toString()
+
         return Mp4FileMetadata(
             retriever.frameAtTime,
             item.name,
             item.path,
             floor(duration + 0.5).toInt().toString(),
             retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH),
-            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
+            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT),
+            fps
         )
     }
 
