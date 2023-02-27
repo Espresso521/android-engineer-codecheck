@@ -6,5 +6,7 @@ data class Mp4FileMetadata(
     val bitmap: Bitmap?,
     val name: String,
     val path: String,
-    val duration: String?
+    val duration: String?,
+    val width: String?,
+    val height: String?
 )

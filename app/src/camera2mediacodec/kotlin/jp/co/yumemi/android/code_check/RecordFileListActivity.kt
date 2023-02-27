@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -34,13 +35,18 @@ class RecordFileListActivity : AppCompatActivity(R.layout.activity_record_file_l
             onItemClickListener = object : FileListAdapter.OnItemClickListener {
                 override fun itemClick(filePath: String) {
                     Log.e("huze", "click file $filePath")
+                    val intent = Intent(this@RecordFileListActivity, MediaPlayerActivity::class.java)
+                    val bundle = Bundle()
+                    bundle.putString("filePath", filePath)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
                 }
             }
             recordFileListViewModel.recordFileList.observe(this@RecordFileListActivity) {
                 if(it.isEmpty()) return@observe
                 submitList(it)
-                binding.titleInfoTextView.text = "Total: ${it.size} files"
                 binding.progressBar.visibility = View.GONE
+                binding.titleInfoTextView.text = "Total: ${it.size} files"
             }
         }
 

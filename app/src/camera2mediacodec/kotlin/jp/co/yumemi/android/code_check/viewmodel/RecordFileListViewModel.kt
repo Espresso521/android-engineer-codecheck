@@ -46,7 +46,9 @@ class RecordFileListViewModel @Inject constructor(
             retriever.frameAtTime,
             item.name,
             item.path,
-            floor(duration + 0.5).toInt().toString()
+            floor(duration + 0.5).toInt().toString(),
+            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH),
+            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
         )
     }
 

@@ -32,6 +32,12 @@
             android:name="jp.co.yumemi.android.code_check.RecordFileListActivity"
             android:exported="false">
         </activity>
+
+        <activity
+            android:name="jp.co.yumemi.android.code_check.MediaPlayerActivity"
+            android:screenOrientation="portrait"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>
