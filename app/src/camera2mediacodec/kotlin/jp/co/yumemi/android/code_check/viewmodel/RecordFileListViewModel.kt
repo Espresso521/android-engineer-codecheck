@@ -38,22 +38,25 @@ class RecordFileListViewModel @Inject constructor(
     }
 
     private fun getMp4FileMetadata(item: File): Mp4FileMetadata {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(item.path)
-        val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            ?.toLong()!!.div(1000.0)
-        val fps = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toInt()
-            ?.div(duration)?.toInt().toString()
+        MediaMetadataRetriever().run {
+            setDataSource(item.path)
+            val duration = extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                ?.toLong()!!.div(1000.0)
+            val fps = extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)
+                ?.toInt()
+                ?.div(duration)?.toInt().toString()
 
-        return Mp4FileMetadata(
-            retriever.frameAtTime,
-            item.name,
-            item.path,
-            floor(duration + 0.5).toInt().toString(),
-            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH),
-            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT),
-            fps
-        )
+            return Mp4FileMetadata(
+                frameAtTime,
+                item.name,
+                item.path,
+                floor(duration + 0.5).toInt().toString(),
+                extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH),
+                extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT),
+                fps,
+                (item.length()/(1024*1024)).toString()
+            )
+        }
     }
 
 }

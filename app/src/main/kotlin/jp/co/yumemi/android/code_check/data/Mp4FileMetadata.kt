@@ -9,5 +9,6 @@ data class Mp4FileMetadata(
     val duration: String?,
     val width: String?,
     val height: String?,
-    val fps: String?
+    val fps: String?,
+    val size: String?
 )

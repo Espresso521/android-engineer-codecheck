@@ -14,11 +14,10 @@
             type="jp.co.yumemi.android.code_check.data.Mp4FileMetadata" />
     </data>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground">
+        android:background="@color/whiteSmoke">
 
         <ImageView
             android:id="@+id/fileIcon"
@@ -28,7 +27,7 @@
             app:bitmap="@{fileInfo.bitmap}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:background="@mipmap/file_list_icon" />
+            tools:background="@mipmap/recording_icon" />
 
         <TextView
             android:id="@+id/fileName"
@@ -46,6 +45,7 @@
             android:id="@+id/durationTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/gray"
             android:layout_marginTop="2dp"
             android:text='@{"Time: " + fileInfo.duration + "s"}'
             app:layout_constraintStart_toStartOf="@id/fileName"
@@ -56,6 +56,7 @@
             android:id="@+id/widthHeight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/gray"
             android:layout_marginTop="2dp"
             android:layout_marginStart="10dp"
             android:text='@{"W*H: " + fileInfo.width + "x" + fileInfo.height}'
@@ -67,6 +68,7 @@
             android:id="@+id/fpsTextview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/gray"
             android:layout_marginTop="2dp"
             android:layout_marginStart="10dp"
             android:text='@{"FPS: " + fileInfo.fps}'
@@ -74,11 +76,25 @@
             app:layout_constraintTop_toBottomOf="@id/fileName"
             tools:text="FPS: 30" />
 
+        <TextView
+            android:id="@+id/sizeTextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="10dp"
+            android:text='@{"Size: " + fileInfo.size + "MB"}'
+            app:layout_constraintStart_toEndOf="@id/fpsTextview"
+            app:layout_constraintTop_toBottomOf="@id/fileName"
+            tools:text="Size: 30MB" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="2dp"
-            android:background="@color/dimGray"
+            android:layout_marginHorizontal="1dp"
+            android:background="@color/skyBlue"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
