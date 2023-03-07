@@ -35,7 +35,8 @@
 
         <activity
             android:name="jp.co.yumemi.android.code_check.MediaPlayerActivity"
-            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false">
         </activity>
     </application>

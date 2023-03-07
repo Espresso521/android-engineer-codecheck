@@ -1,19 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="jp.co.yumemi.android.code_check.CameraActivity">
+    tools:context=".MediaPlayerActivity">
 
-
-    <SurfaceView
+    <jp.co.yumemi.android.code_check.ui.UrbanXSurfaceView
         android:id="@+id/mediaPlaySFView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="16:9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="512dp"
+        android:layout_centerVertical="true" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/fileNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/dimGray"
+            tools:text="2023-03-01-20-11-11.mp4" />
+
+        <ImageView
+            android:id="@+id/closeImageView"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:background="@mipmap/close_bold_icon" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/playControlImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:background="@mipmap/pause_icon" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/positionSeekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="5dp"
+            android:layout_toStartOf="@id/playTimeFirstTextView"
+            android:layout_toEndOf="@id/playControlImageView"
+            android:max="100"
+            android:maxHeight="@dimen/audio_course_item_seek_bar_progress_height"
+            android:min="1"
+            android:minHeight="@dimen/audio_course_item_seek_bar_progress_height"
+            android:progressDrawable="@drawable/layers_seek_bar_progress_1"
+            android:thumb="@drawable/shape_thumb_round_1" />
+
+        <TextView
+            android:id="@+id/playTimeFirstTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/playTimeSecondTextView"
+            android:layout_centerVertical="true"
+            android:text="00:00" />
+
+        <TextView
+            android:id="@+id/playTimeSecondTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:text="/30:00" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/previewImageView"
+        android:visibility="gone"
+        android:layout_width="160dp"
+        android:layout_height="90dp"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>
