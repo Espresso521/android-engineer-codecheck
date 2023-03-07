@@ -8,15 +8,15 @@
 
     <jp.co.yumemi.android.code_check.ui.UrbanXSurfaceView
         android:id="@+id/mediaPlaySFView"
-        android:layout_width="match_parent"
-        android:layout_height="512dp"
-        android:layout_centerVertical="true" />
+        android:layout_width="512dp"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="8dp">
 
         <TextView
             android:id="@+id/fileNameTextView"

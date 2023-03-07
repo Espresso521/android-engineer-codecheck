@@ -95,9 +95,9 @@ class MediaPlayerActivity : AppCompatActivity(R.layout.activity_mediaplayer) {
 
     override fun onResume() {
         super.onResume()
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            val screenW = windowManager.currentWindowMetrics.bounds.width()
-            binding.mediaPlaySFView.adjustSize(screenW, screenW * 9 / 16)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val screenH = windowManager.currentWindowMetrics.bounds.height()
+            binding.mediaPlaySFView.adjustSize(screenH * 9 / 16, screenH)
         }
     }
 
@@ -117,12 +117,12 @@ class MediaPlayerActivity : AppCompatActivity(R.layout.activity_mediaplayer) {
             else -> "Configuration.ORIENTATION_UNDEFINED"
         }
         Log.d(TAG, "orientation is $orientation, screenWidth is $screenW, screenHeight is $screenH")
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
-            && screenW * 9 > screenH * 16
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
+            && screenW * 16 < screenH * 9
         ) {
-            binding.mediaPlaySFView.adjustSize(screenH * 16 / 9, screenH)
+            binding.mediaPlaySFView.adjustSize(screenW, screenW * 16 / 9)
         } else {
-            binding.mediaPlaySFView.adjustSize(screenW, screenW * 9 / 16)
+            binding.mediaPlaySFView.adjustSize(screenH * 9 / 16, screenH)
         }
     }
 
