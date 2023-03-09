@@ -7,6 +7,7 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -292,6 +293,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
         binding.captureImgView.let {
             it.post { it.setImageBitmap(bitmap) }
         }
+    }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this).setTitle("アプリを終了しますか？")
+            .setPositiveButton("はい") { _, _ -> finish() }
+            .setNegativeButton("いいえ") { dialog, _ -> dialog.dismiss() }.show()
     }
 
 }
