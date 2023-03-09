@@ -12,9 +12,13 @@ GitHub のリポジトリを検索するアプリ
 
 <img src="docs/githubRepoSearch.gif" width="320">
 
-Camera２、MediaCodec、MediaRecorder、AudioRecord、AudioTrackの効果
+Camera２、MediaCodec、AudioRecord、AudioTrackの効果
 
 <img src="docs/camera2mediacodec.gif" width="320">
+
+MediaRecorderの効果
+
+<img src="docs/recordplayer.gif" width="320">
 
 ### 動作
 
