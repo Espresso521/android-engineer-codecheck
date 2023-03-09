@@ -28,7 +28,7 @@ class FileListAdapter @Inject constructor(
     lateinit var onItemClickListener: OnItemClickListener
 
     interface OnItemClickListener {
-        fun itemClick(filePath: String)
+        fun itemClick(fileMetadata: Mp4FileMetadata)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -46,7 +46,7 @@ class FileListAdapter @Inject constructor(
         val item = getItem(position)
         holder.bind(item, fragment as LifecycleOwner)
         holder.itemView.setOnClickListener {
-            onItemClickListener.itemClick(item.path)
+            onItemClickListener.itemClick(item)
         }
     }
 }

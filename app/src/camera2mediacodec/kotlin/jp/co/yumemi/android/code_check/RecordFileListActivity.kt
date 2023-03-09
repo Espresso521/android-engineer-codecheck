@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import jp.co.yumemi.android.code_check.data.Mp4FileMetadata
 import jp.co.yumemi.android.code_check.databinding.ActivityRecordFileListBinding
 import jp.co.yumemi.android.code_check.ui.adapter.FileListAdapter
 import jp.co.yumemi.android.code_check.utils.FileUtils
@@ -33,12 +34,14 @@ class RecordFileListActivity : AppCompatActivity(R.layout.activity_record_file_l
 
         adapter.run {
             onItemClickListener = object : FileListAdapter.OnItemClickListener {
-                override fun itemClick(filePath: String) {
-                    Log.e("huze", "click file $filePath")
+                override fun itemClick(fileMetadata: Mp4FileMetadata) {
+                    Log.e("huze", "click file $fileMetadata")
                     val intent = Intent(this@RecordFileListActivity, MediaPlayerActivity::class.java)
-                    val bundle = Bundle()
-                    bundle.putString("filePath", filePath)
-                    intent.putExtras(bundle)
+
+                    intent.putExtras(Bundle().apply {
+                        putString(MediaPlayerActivity.filePathKey, fileMetadata.path)
+                        putString(MediaPlayerActivity.fileNameKey, fileMetadata.name)
+                    })
                     startActivity(intent)
                 }
             }
