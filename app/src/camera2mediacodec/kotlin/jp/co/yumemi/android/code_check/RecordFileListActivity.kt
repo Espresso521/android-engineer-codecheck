@@ -1,6 +1,5 @@
 package jp.co.yumemi.android.code_check
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -36,7 +35,7 @@ class RecordFileListActivity : AppCompatActivity(R.layout.activity_record_file_l
             onItemClickListener = object : FileListAdapter.OnItemClickListener {
                 override fun itemClick(fileMetadata: Mp4FileMetadata) {
                     Log.e("huze", "click file $fileMetadata")
-                    val intent = Intent(this@RecordFileListActivity, MediaPlayerActivity::class.java)
+                    val intent = MediaPlayerActivity.createIntent(this@RecordFileListActivity)
 
                     intent.putExtras(Bundle().apply {
                         putString(MediaPlayerActivity.filePathKey, fileMetadata.path)

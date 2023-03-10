@@ -59,6 +59,7 @@
             android:textColor="@color/gray"
             android:layout_marginTop="2dp"
             android:layout_marginStart="10dp"
+            android:visibility="gone"
             android:text='@{"W*H: " + fileInfo.width + "x" + fileInfo.height}'
             app:layout_constraintStart_toEndOf="@id/durationTextView"
             app:layout_constraintTop_toBottomOf="@id/fileName"
