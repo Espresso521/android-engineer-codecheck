@@ -214,6 +214,7 @@ class CameraCapture @Inject constructor(
     private val onCaptureImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
         Log.d(TAG, "capture image available")
         val image: Image = reader.acquireNextImage()
+        FileUtils.saveJpeg(context, "", "captured.jpeg", image)
         val planes = image.planes
         val buffer: ByteBuffer = planes[0].buffer
         buffer.rewind()
@@ -275,7 +276,7 @@ class CameraCapture @Inject constructor(
             Locale.JAPAN
         ).format(Date(System.currentTimeMillis()))
         val file =
-            File(FileUtils.getMediaFileDir(context), "record_$fileName.mp4")
+            File(FileUtils.getMediaFileDirOld(context), "record_$fileName.mp4")
         mediaRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setVideoSource(MediaRecorder.VideoSource.SURFACE)

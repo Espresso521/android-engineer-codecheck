@@ -60,6 +60,6 @@ class RecordFileListActivity : AppCompatActivity(R.layout.activity_record_file_l
 
     override fun onResume() {
         super.onResume()
-        recordFileListViewModel.doRefreshRecordFileList(FileUtils.getMediaFileDir(this@RecordFileListActivity))
+        recordFileListViewModel.doRefreshRecordFileList(FileUtils.getMediaFileDirOld(this@RecordFileListActivity))
     }
 }
