@@ -1,12 +1,15 @@
 package jp.co.yumemi.android.code_check.viewmodel
 
-import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.api.Future
 import jp.co.yumemi.android.code_check.api.IApiImpl
 import jp.co.yumemi.android.code_check.api.apiFlow
+import jp.co.yumemi.android.code_check.data.model.Login
+import jp.co.yumemi.android.code_check.data.model.ResponseResult
 import jp.co.yumemi.android.code_check.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -19,7 +22,8 @@ class LoginViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val TAG = LoginViewModel::class.java.simpleName
+    private val _loginResponse = MutableLiveData<Future<ResponseResult<Login>>>(Future.Proceeding)
+    val loginResponse: LiveData<Future<ResponseResult<Login>>> = _loginResponse
 
     fun login(username: String, password: String) =
         viewModelScope.launch(ioDispatcher) {
@@ -31,17 +35,7 @@ class LoginViewModel @Inject constructor(
                 }.build()
                 IApiImpl.get().login(requestBody)
             }.collect {
-                when (it) {
-                    is Future.Proceeding -> {
-                        Log.e(TAG, "app login is proceeding")
-                    }
-                    is Future.Success -> {
-                        Log.d(TAG, "app login Success value is ${it.value}")
-                    }
-                    is Future.Error -> {
-                        Log.d(TAG, "app login is ERROR: ${it.error}")
-                    }
-                }
+                _loginResponse.postValue(it)
             }
         }
 }
