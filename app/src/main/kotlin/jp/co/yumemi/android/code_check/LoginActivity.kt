@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +46,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
                     finish()
                 }
                 is Future.Error -> {
+                    Toast.makeText(this@LoginActivity, "Username or password Error", Toast.LENGTH_LONG).show()
                     Log.d(TAG, "app login is ERROR: ${it.error}")
                 }
             }
