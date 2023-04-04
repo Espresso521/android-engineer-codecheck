@@ -1,17 +1,17 @@
 package jp.co.yumemi.android.code_check.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.co.yumemi.android.code_check.api.Future
+import jp.co.yumemi.android.code_check.api.HttpRequestState
 import jp.co.yumemi.android.code_check.api.IApiImpl
 import jp.co.yumemi.android.code_check.api.apiFlow
 import jp.co.yumemi.android.code_check.data.model.Login
 import jp.co.yumemi.android.code_check.data.model.ResponseResult
 import jp.co.yumemi.android.code_check.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -22,8 +22,8 @@ class LoginViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val _loginResponse = MutableLiveData<Future<ResponseResult<Login>>>(Future.Proceeding)
-    val loginResponse: LiveData<Future<ResponseResult<Login>>> = _loginResponse
+    private val _loginResponse = MutableStateFlow<HttpRequestState<ResponseResult<Login>>>(HttpRequestState.Proceeding)
+    val loginResponse: StateFlow<HttpRequestState<ResponseResult<Login>>> = _loginResponse
 
     fun login(username: String, password: String) =
         viewModelScope.launch(ioDispatcher) {
@@ -35,7 +35,7 @@ class LoginViewModel @Inject constructor(
                 }.build()
                 IApiImpl.get().login(requestBody)
             }.collect {
-                _loginResponse.postValue(it)
+                _loginResponse.value = it
             }
         }
 }

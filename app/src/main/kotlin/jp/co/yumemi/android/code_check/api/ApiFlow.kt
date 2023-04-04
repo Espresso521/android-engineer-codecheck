@@ -5,24 +5,30 @@ import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import retrofit2.Response
 
-inline fun <reified T : Any> apiFlow(crossinline call: suspend () -> Response<T>): Flow<Future<T>> =
-    flow<Future<T>> {
+inline fun <reified T : Any> apiFlow(crossinline call: suspend () -> Response<T>): Flow<HttpRequestState<T>> =
+    flow<HttpRequestState<T>> {
         val response = call()
-        if (response.isSuccessful) emit(Future.Success(value = response.body()!!))
+        if (response.isSuccessful) emit(HttpRequestState.Success(value = response.body()!!))
         else throw HttpException(response)
     }.catch { it: Throwable ->
-        emit(Future.Error(it))
+        emit(HttpRequestState.Error(it))
     }.onStart {
-        emit(Future.Proceeding)
+        emit(HttpRequestState.Proceeding)
     }.flowOn(Dispatchers.IO)
 
-inline fun <reified T : Any?> apiNullableFlow(crossinline call: suspend () -> Response<T?>): Flow<Future<T?>> =
-    flow<Future<T?>> {
+inline fun <reified T : Any?> apiNullableFlow(crossinline call: suspend () -> Response<T?>): Flow<HttpRequestState<T?>> =
+    flow<HttpRequestState<T?>> {
         val response = call()
-        if (response.isSuccessful) emit(Future.Success(value = response.body()))
+        if (response.isSuccessful) emit(HttpRequestState.Success(value = response.body()))
         else throw HttpException(response)
     }.catch { it: Throwable ->
-        emit(Future.Error(it))
+        emit(HttpRequestState.Error(it))
     }.onStart {
-        emit(Future.Proceeding)
+        emit(HttpRequestState.Proceeding)
     }.flowOn(Dispatchers.IO)
+
+sealed class HttpRequestState<out T> {
+    object Proceeding : HttpRequestState<Nothing>()
+    data class Success<out T>(val value: T) : HttpRequestState<T>()
+    data class Error(val error: Throwable) : HttpRequestState<Nothing>()
+}
