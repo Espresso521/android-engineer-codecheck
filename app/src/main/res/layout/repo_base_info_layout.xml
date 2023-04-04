@@ -45,7 +45,7 @@
                 android:layout_marginLeft="5dp"
                 android:gravity="bottom"
                 android:text='@{repoInfo.stargazersCount + " Start", default="123 Star"}'
-                android:textColor="@color/black"
+                android:textColor="@color/dimGray"
                 android:textSize="15sp" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -71,7 +71,7 @@
                 android:layout_marginLeft="5dp"
                 android:gravity="bottom"
                 android:text='@{repoInfo.watchersCount + " Watch", default="456 Watch"}'
-                android:textColor="@color/black"
+                android:textColor="@color/dimGray"
                 android:textSize="15sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -96,7 +96,7 @@
                 android:layout_marginLeft="5dp"
                 android:gravity="bottom"
                 android:text='@{repoInfo.forksCount + " Fork", default="789 Fork"}'
-                android:textColor="@color/black"
+                android:textColor="@color/dimGray"
                 android:textSize="15sp" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -123,7 +123,7 @@
                 android:layout_marginLeft="5dp"
                 android:gravity="bottom"
                 android:text='@{repoInfo.openIssuesCount + " Issues", default="1234 Issues"}'
-                android:textColor="@color/black"
+                android:textColor="@color/dimGray"
                 android:textSize="15sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 

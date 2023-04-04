@@ -43,6 +43,7 @@
                 android:background="@android:color/transparent"
                 android:hint="@string/searchInputText_hint"
                 android:imeOptions="actionSearch"
+                android:text="kotlin"
                 android:inputType="text"
                 android:textSize="12sp" />
 
