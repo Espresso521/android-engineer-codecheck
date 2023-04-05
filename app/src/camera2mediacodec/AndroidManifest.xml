@@ -18,7 +18,7 @@
         android:theme="@style/Theme.AndroidEngineerCodeCheck"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
-            android:name="jp.co.yumemi.android.code_check.CameraActivity"
+            android:name="jp.co.yumemi.android.code_check.CameraLoginActivity"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
@@ -27,6 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="jp.co.yumemi.android.code_check.CameraActivity"
+            android:screenOrientation="portrait"
+            android:exported="false">
+        </activity>
+
 
         <activity
             android:name="jp.co.yumemi.android.code_check.RecordFileListActivity"

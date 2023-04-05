@@ -18,7 +18,7 @@ import jp.co.yumemi.android.code_check.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity(R.layout.activity_login) {
+open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     companion object {
         var TAG = LoginActivity::class.java.simpleName
     }
@@ -54,8 +54,7 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
                         }
                         is HttpRequestState.Success -> {
                             Log.d(TAG, "app login Success value is ${it.value}")
-                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                            finish()
+                            onLoginSuccess()
                         }
                         is HttpRequestState.Error -> {
                             Toast.makeText(
@@ -69,5 +68,10 @@ class LoginActivity : AppCompatActivity(R.layout.activity_login) {
                 }
             }
         }
+    }
+
+    protected open fun onLoginSuccess() {
+        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        finish()
     }
 }
