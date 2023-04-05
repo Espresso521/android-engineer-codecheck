@@ -3,8 +3,6 @@ package jp.co.yumemi.android.code_check
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.View.OnClickListener
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +18,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
     companion object {
-        var TAG = LoginActivity::class.java.simpleName
+        var TAG = this::class.java.simpleName
     }
 
     private lateinit var binding: ActivityLoginBinding
@@ -33,14 +31,12 @@ open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.loginButton.setOnClickListener(object : OnClickListener {
-            override fun onClick(v: View?) {
-                loginViewModel.login(
-                    binding.nameEditText.text.toString(),
-                    binding.passwordEditText.text.toString()
-                )
-            }
-        })
+        binding.loginButton.setOnClickListener {
+            loginViewModel.login(
+                binding.nameEditText.text.toString(),
+                binding.passwordEditText.text.toString()
+            )
+        }
 
         // Start a coroutine in the lifecycle scope
         lifecycleScope.launch {
