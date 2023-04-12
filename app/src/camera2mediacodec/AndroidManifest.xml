@@ -34,9 +34,14 @@
             android:exported="false">
         </activity>
 
-
         <activity
             android:name="jp.co.yumemi.android.code_check.RecordFileListActivity"
+            android:exported="false">
+        </activity>
+
+        <activity
+            android:name="jp.kotaku.camera.activity.BankSettingActivity"
+            android:screenOrientation="portrait"
             android:exported="false">
         </activity>
 

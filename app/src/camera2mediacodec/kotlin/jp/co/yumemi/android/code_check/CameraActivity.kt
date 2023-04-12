@@ -42,6 +42,7 @@ import jp.co.yumemi.android.code_check.codec.VideoDecoder
 import jp.co.yumemi.android.code_check.codec.VideoEncoder
 import jp.co.yumemi.android.code_check.databinding.ActivityCameraBinding
 import jp.co.yumemi.android.code_check.utils.YUVUtil
+import jp.kotaku.camera.activity.BankSettingActivity
 import java.util.*
 import javax.inject.Inject
 
@@ -156,11 +157,23 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera), ICameraTakeP
             }
         })
 
-        binding.fabFileList.setOnClickListener(object : OnClickListener {
-            override fun onClick(v: View?) {
-                startActivity(Intent(this@CameraActivity, RecordFileListActivity::class.java))
-            }
-        })
+        binding.fabFileList.setOnClickListener {
+            startActivity(
+                Intent(
+                    this@CameraActivity,
+                    RecordFileListActivity::class.java
+                )
+            )
+        }
+
+        binding.bankWebView.setOnClickListener {
+            startActivity(
+                Intent(
+                    this@CameraActivity,
+                    BankSettingActivity::class.java
+                )
+            )
+        }
     }
 
     private fun initSeekBar() {

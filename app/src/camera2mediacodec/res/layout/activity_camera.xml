@@ -82,6 +82,16 @@
         app:layout_constraintBottom_toTopOf="@id/fab"
         android:layout_margin="11dp" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bank_web_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/web_icon"
+        android:contentDescription="audio play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fab_file_list"
+        android:layout_margin="11dp" />
+
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
