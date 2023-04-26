@@ -25,7 +25,7 @@ class RecordFileListViewModel @Inject constructor(
 
     fun doRefreshRecordFileList(folder: File?) {
         viewModelScope.launch(ioDispatcher) {
-            _recordFileList.postValue(getRecordFileList(folder))
+            _recordFileList.postValue(getRecordFileList(folder).sortedByDescending { it.name })
         }
     }
 

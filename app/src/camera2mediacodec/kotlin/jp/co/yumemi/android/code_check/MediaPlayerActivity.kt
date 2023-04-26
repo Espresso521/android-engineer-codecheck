@@ -131,6 +131,7 @@ class MediaPlayerActivity : AppCompatActivity(R.layout.activity_mediaplayer) {
             mediaPlayer.setSurface(holder.surface)
             mediaPlayer.start()
             startSeekTimer()
+            binding.playControlImageView.setBackgroundResource(R.mipmap.pause_icon)
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -139,6 +140,9 @@ class MediaPlayerActivity : AppCompatActivity(R.layout.activity_mediaplayer) {
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             Log.e(TAG, "SurfaceView Destroyed")
+            mediaPlayer.pause()
+            stopSeekTimer()
+            binding.playControlImageView.setBackgroundResource(R.mipmap.play_icon)
         }
     }
 
