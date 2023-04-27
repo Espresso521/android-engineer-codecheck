@@ -43,11 +43,13 @@ android {
     productFlavors {
         githubsearch{
             dimension "HUZE"
+            buildConfigField "String", "API_HOST", '"https://api.github.com/"'
         }
 
         camera2mediacodec{
             dimension "HUZE"
             applicationId "jp.kotaku.camera.mediacodec"
+            buildConfigField "String", "API_HOST", '"https://kotaku-blog.link/"'
         }
     }
 }

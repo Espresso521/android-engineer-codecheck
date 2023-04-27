@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 object IApiImpl {
     private val api by lazy {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://kotaku-blog.link/")
+            .baseUrl(BuildConfig.API_HOST)
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .client(
                 OkHttpClient.Builder().apply {
@@ -25,7 +25,7 @@ object IApiImpl {
                             if (message.length > 2048) message.substring(0, 2048) else message
                         Log.d("OkHttpClientLog", logStr)
                     }
-                }.setLevel(HttpLoggingInterceptor.Level.BODY))
+                }.setLevel(HttpLoggingInterceptor.Level.BODY)).addInterceptor(BaseUrlInterceptor())
                     .build()
             )
             .build()

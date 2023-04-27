@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.api.HttpRequestState
+import jp.co.yumemi.android.code_check.api.IApi
 import jp.co.yumemi.android.code_check.api.IApiImpl
 import jp.co.yumemi.android.code_check.api.apiFlow
 import jp.co.yumemi.android.code_check.data.model.Login
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val httpsAPI: IApi
 ) :
     ViewModel() {
 
@@ -33,7 +35,7 @@ class LoginViewModel @Inject constructor(
                     addFormDataPart("username", username)
                     addFormDataPart("password", password)
                 }.build()
-                IApiImpl.get().login(requestBody)
+                httpsAPI.login(requestBody)
             }.collect {
                 _loginResponse.value = it
             }
