@@ -1,8 +1,6 @@
 package jp.co.yumemi.android.code_check.data
 
-import io.ktor.client.*
 import jp.co.yumemi.android.code_check.api.IApi
-import jp.co.yumemi.android.code_check.api.IApiImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

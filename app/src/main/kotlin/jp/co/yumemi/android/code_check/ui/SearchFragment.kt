@@ -6,7 +6,11 @@ package jp.co.yumemi.android.code_check.ui
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,13 +19,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.data.RepoInfo
 import jp.co.yumemi.android.code_check.databinding.FragmentSearchBinding
 import jp.co.yumemi.android.code_check.ui.adapter.ResultListAdapter
+import jp.co.yumemi.android.code_check.viewmodel.FlowSearchViewModel
+import jp.co.yumemi.android.code_check.viewmodel.LatestReposUiState
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
 
     private val searchViewModel: SearchViewModel by activityViewModels()
+    private val flowSearchViewModel: FlowSearchViewModel by activityViewModels()
 
     @Inject
     lateinit var adapter: ResultListAdapter
@@ -46,7 +54,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 editText.text.toString().let { keyword ->
                     if (keyword.isNotEmpty() && lastKeyWord != keyword) {
                         lastKeyWord = keyword
-                        searchViewModel.doSearch(keyword)
+                        //searchViewModel.doSearch(keyword)
+                        flowSearchViewModel.doSearch(keyword)
                     }
                     hideSoftInput(view)
                 }
@@ -74,6 +83,25 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     }
                 }
             })
+        }
+
+        // Start a coroutine in the lifecycle scope
+        lifecycleScope.launch {
+            // repeatOnLifecycle launches the block in a new coroutine every time the
+            // lifecycle is in the STARTED state (or above) and cancels it when it's STOPPED.
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Trigger the flow and start listening for values.
+                // Note that this happens when lifecycle is STARTED and stops
+                // collecting when the lifecycle is STOPPED
+                flowSearchViewModel.uiState.collect { uiState ->
+                    // New value received
+                    when (uiState) {
+                        is LatestReposUiState.Success -> adapter.submitList(uiState.repos)
+                        is LatestReposUiState.Error -> Toast.makeText(activity, "$uiState.exception", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            }
         }
     }
 
