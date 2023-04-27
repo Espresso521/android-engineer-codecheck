@@ -12,4 +12,11 @@ class RepositoryRemoteDataSource @Inject constructor(
         val searchResult = httpsAPI.search(key)
         emit(searchResult)
     }
+
+    fun doPageSearch(key: String, page: String): Flow<SearchResult> = flow {
+        val searchResult = httpsAPI.doPageSearch(key, page)
+        if (searchResult.items.isNotEmpty()) {
+            emit(searchResult)
+        }
+    }
 }

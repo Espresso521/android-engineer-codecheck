@@ -5,10 +5,7 @@ import jp.co.yumemi.android.code_check.data.model.Login
 import jp.co.yumemi.android.code_check.data.model.ResponseResult
 import okhttp3.RequestBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface IApi {
 
@@ -17,5 +14,9 @@ interface IApi {
 
     @GET("search/repositories")
     suspend fun search(@Query("q") key: String): SearchResult
+
+    @GET("search/repositories")
+    @Headers("Accept: application/vnd.github.v3+json")
+    suspend fun doPageSearch(@Query("q") key: String, @Query("page") page: String): SearchResult
 
 }

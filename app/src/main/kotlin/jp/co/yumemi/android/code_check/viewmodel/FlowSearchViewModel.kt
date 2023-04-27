@@ -25,6 +25,8 @@ class FlowSearchViewModel @Inject constructor(
 ) :
     ViewModel() {
 
+    private val resultList = mutableListOf<RepoInfo>()
+
     // Backing property to avoid state updates from other classes
     private val _uiState = MutableStateFlow(LatestReposUiState.Success(emptyList()))
     // The UI collects from this StateFlow to get its state updates
@@ -33,9 +35,23 @@ class FlowSearchViewModel @Inject constructor(
     fun doSearch(keyWord: String) = viewModelScope.launch(ioDispatcher) {
         searchResultRepository.getSearchResult(keyWord).collect { searchResult ->
             if (searchResult.items.isNotEmpty()) {
-                _uiState.value = LatestReposUiState.Success(searchResult.items)
+                resultList.addAll(searchResult.items)
+                _uiState.value = LatestReposUiState.Success(resultList.toList())
             }
         }
+    }
+
+    fun doPageSearch(key: String, page: String) = viewModelScope.launch(ioDispatcher) {
+        searchResultRepository.doPageSearch(key, page).collect { searchResult ->
+            if (searchResult.items.isNotEmpty()) {
+                resultList.addAll(searchResult.items)
+                _uiState.value = LatestReposUiState.Success(resultList.toList())
+            }
+        }
+    }
+
+    fun getListCount(): Int {
+        return resultList.size
     }
 }
 

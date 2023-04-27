@@ -45,16 +45,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             }
         }
 
-        searchViewModel.searchResults.observe(viewLifecycleOwner) { searchResults ->
-            adapter.submitList(searchResults.toList())
-        }
-
         binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) {
                 editText.text.toString().let { keyword ->
                     if (keyword.isNotEmpty() && lastKeyWord != keyword) {
                         lastKeyWord = keyword
-                        //searchViewModel.doSearch(keyword)
                         flowSearchViewModel.doSearch(keyword)
                     }
                     hideSoftInput(view)
@@ -73,12 +68,18 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
                     if (!isLoading) {
                         if (linearLayoutManager != null
-                            && linearLayoutManager.findLastCompletelyVisibleItemPosition() == searchViewModel.searchResults.value?.size?.minus(
-                                1
-                            )
+                            && linearLayoutManager.findLastCompletelyVisibleItemPosition() == flowSearchViewModel.getListCount()
+                                .minus(
+                                    1
+                                )
                         ) {
                             isLoading = true
-                            loadMore()
+                            if (lastKeyWord.isNotEmpty()) {
+                                loadMore(
+                                    lastKeyWord,
+                                    flowSearchViewModel.getListCount().div(30).plus(1).toString()
+                                )
+                            }
                         }
                     }
                 }
@@ -96,8 +97,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 flowSearchViewModel.uiState.collect { uiState ->
                     // New value received
                     when (uiState) {
-                        is LatestReposUiState.Success -> adapter.submitList(uiState.repos)
-                        is LatestReposUiState.Error -> Toast.makeText(activity, "$uiState.exception", Toast.LENGTH_SHORT)
+                        is LatestReposUiState.Success -> {
+                            adapter.submitList(uiState.repos)
+                            isLoading = false
+                        }
+                        is LatestReposUiState.Error -> Toast.makeText(
+                            activity,
+                            "$uiState.exception",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                 }
@@ -105,8 +113,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         }
     }
 
-    fun loadMore() {
-        searchViewModel.doPageSearch()
+    fun loadMore(key: String, page: String) {
+        flowSearchViewModel.doPageSearch(key, page)
     }
 
     fun gotoRepositoryFragment(repoInfo: RepoInfo) {
