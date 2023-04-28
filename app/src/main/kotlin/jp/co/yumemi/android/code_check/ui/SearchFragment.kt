@@ -34,6 +34,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     @Inject
     lateinit var adapter: ResultListAdapter
 
+    @Inject
+    lateinit var progressDismissDialog: ProgressDismissDialog
+
     private var isLoading = false
 
     private var lastKeyWord = ""
@@ -74,6 +77,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                                 )
                         ) {
                             isLoading = true
+                            progressDismissDialog.startLoadingDialog()
                             if (lastKeyWord.isNotEmpty()) {
                                 loadMore(
                                     lastKeyWord,
@@ -100,6 +104,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                         is LatestReposUiState.Success -> {
                             adapter.submitList(uiState.repos)
                             isLoading = false
+                            progressDismissDialog.dismissDialog()
                         }
                         is LatestReposUiState.Error -> Toast.makeText(
                             activity,
