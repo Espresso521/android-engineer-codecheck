@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import jp.co.yumemi.android.code_check.databinding.FragmentResultBinding
+import jp.co.yumemi.android.code_check.viewmodel.FlowSearchViewModel
 import jp.co.yumemi.android.code_check.viewmodel.SearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,18 +20,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ResultOutlineFragment : BaseFragment<FragmentResultBinding>(FragmentResultBinding::inflate) {
 
-    private val searchViewModel: SearchViewModel by activityViewModels()
+    private val flowSearchViewModel: FlowSearchViewModel by activityViewModels()
 
     @Inject
     lateinit var markdown: Markwon
 
     override fun setUpViewsAndObserve(view: View) {
-        searchViewModel.selectedResults.observe(viewLifecycleOwner) {
+        flowSearchViewModel.selectedResults.observe(viewLifecycleOwner) {
             binding.repoInfo = it
             binding.resultScrollView.fullScroll(ScrollView.FOCUS_UP)
         }
 
-        searchViewModel.readMe.observe(viewLifecycleOwner) {
+        flowSearchViewModel.readMe.observe(viewLifecycleOwner) {
             it?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
                     var toMarkDown = markdown.toMarkdown(it)

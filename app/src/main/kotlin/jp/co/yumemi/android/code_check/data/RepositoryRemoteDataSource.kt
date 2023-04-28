@@ -39,4 +39,13 @@ class RepositoryRemoteDataSource @Inject constructor(
         }.onStart {
             emit(LatestReposUiState.Loading)
         }
+
+    suspend fun getReadMe(url: String): String {
+        val result = httpsAPI.getReadMe(url)
+        return if(result.body() == null) {
+            ""
+        } else {
+            result.body()!!.string()
+        }
+    }
 }

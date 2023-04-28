@@ -29,7 +29,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
 
-    private val searchViewModel: SearchViewModel by activityViewModels()
     private val flowSearchViewModel: FlowSearchViewModel by activityViewModels()
 
     @Inject
@@ -93,6 +92,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        /**
+         * U must call follow function in onCreate()
+         * if U call it in onCreateView(), the collect will be callback too many times!!!
+         * */
         // Start a coroutine in the lifecycle scope
         lifecycleScope.launch {
             // repeatOnLifecycle launches the block in a new coroutine every time the
@@ -129,7 +132,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     }
 
     fun gotoRepositoryFragment(repoInfo: RepoInfo) {
-        searchViewModel.setSelectedItem(repoInfo)
+        flowSearchViewModel.setSelectedItem(repoInfo)
         if (resources.configuration.orientation == ORIENTATION_PORTRAIT) {
             findNavController().navigate(
                 SearchFragmentDirections.actionSearchFragmentToResultOutlineFragment()

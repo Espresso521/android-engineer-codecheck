@@ -3,6 +3,8 @@
  */
 package jp.co.yumemi.android.code_check.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,12 @@ class FlowSearchViewModel @Inject constructor(
 
     private val resultList = mutableListOf<RepoInfo>()
     private var lastKeyWord: String = ""
+
+    private var _selectedResults: MutableLiveData<RepoInfo> = MutableLiveData()
+    val selectedResults: LiveData<RepoInfo> = _selectedResults
+
+    private var _readMe: MutableLiveData<String> = MutableLiveData()
+    val readMe: LiveData<String> = _readMe
 
     // Backing property to avoid state updates from other classes
     private val _uiState = MutableStateFlow<LatestReposUiState>(LatestReposUiState.Success(emptyList()))
@@ -71,6 +79,26 @@ class FlowSearchViewModel @Inject constructor(
 
     fun getListCount(): Int {
         return resultList.size
+    }
+
+    fun setSelectedItem(repoInfo: RepoInfo) {
+        if (_selectedResults.value?.fullName != repoInfo.fullName) {
+            _selectedResults.value = repoInfo
+            getReadMe()
+            _readMe.postValue("Loading...")
+        }
+    }
+
+    private fun getReadMe() {
+        selectedResults.value?.fullName?.let { fullName ->
+            viewModelScope.launch((ioDispatcher)) {
+                val url = "https://raw.githubusercontent.com/$fullName/master/README.md"
+                searchResultRepository.getReadMe(url).let { result ->
+                    if(result.isEmpty()) _readMe.postValue("No ReadMe.md")
+                    else _readMe.postValue(result)
+                }
+            }
+        }
     }
 }
 
