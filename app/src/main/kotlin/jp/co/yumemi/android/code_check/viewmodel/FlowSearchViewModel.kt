@@ -15,37 +15,56 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel for [jp.co.yumemi.android.code_check.ui.SearchFragment]
- */
 @HiltViewModel
 class FlowSearchViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    var searchResultRepository: RepositoryRemoteDataSource
+    private var searchResultRepository: RepositoryRemoteDataSource
 ) :
     ViewModel() {
 
     private val resultList = mutableListOf<RepoInfo>()
+    private var lastKeyWord: String = ""
 
     // Backing property to avoid state updates from other classes
-    private val _uiState = MutableStateFlow(LatestReposUiState.Success(emptyList()))
+    private val _uiState = MutableStateFlow<LatestReposUiState>(LatestReposUiState.Success(emptyList()))
     // The UI collects from this StateFlow to get its state updates
     val uiState: StateFlow<LatestReposUiState> = _uiState
 
     fun doSearch(keyWord: String) = viewModelScope.launch(ioDispatcher) {
-        searchResultRepository.getSearchResult(keyWord).collect { searchResult ->
-            if (searchResult.items.isNotEmpty()) {
-                resultList.addAll(searchResult.items)
-                _uiState.value = LatestReposUiState.Success(resultList.toList())
+        if(lastKeyWord == keyWord && resultList.size != 0) {
+            _uiState.value = LatestReposUiState.Success(resultList)
+        } else {
+            lastKeyWord = keyWord
+            searchResultRepository.getSearchResult(keyWord).collect { searchResult ->
+                when(searchResult) {
+                    is LatestReposUiState.Success -> {
+                        resultList.addAll(searchResult.repos)
+                        _uiState.value = LatestReposUiState.Success(resultList)
+                    }
+                    is LatestReposUiState.Error -> {
+                        _uiState.value = LatestReposUiState.Error(searchResult.exception)
+                    }
+                    is LatestReposUiState.Loading -> {
+                        _uiState.value = LatestReposUiState.Loading
+                    }
+                }
             }
         }
     }
 
     fun doPageSearch(key: String, page: String) = viewModelScope.launch(ioDispatcher) {
         searchResultRepository.doPageSearch(key, page).collect { searchResult ->
-            if (searchResult.items.isNotEmpty()) {
-                resultList.addAll(searchResult.items)
-                _uiState.value = LatestReposUiState.Success(resultList.toList())
+            when(searchResult) {
+                is LatestReposUiState.Success -> {
+                    resultList.addAll(searchResult.repos)
+                    _uiState.value = LatestReposUiState.Success(resultList)
+                }
+                is LatestReposUiState.Error -> {
+                    _uiState.value = LatestReposUiState.Error(searchResult.exception)
+                }
+                is LatestReposUiState.Loading -> {
+                    _uiState.value = LatestReposUiState.Loading
+                }
             }
         }
     }
@@ -58,4 +77,5 @@ class FlowSearchViewModel @Inject constructor(
 sealed class LatestReposUiState {
     data class Success(val repos: List<RepoInfo>): LatestReposUiState()
     data class Error(val exception: Throwable): LatestReposUiState()
+    object Loading: LatestReposUiState()
 }

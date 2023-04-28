@@ -4,6 +4,7 @@
 package jp.co.yumemi.android.code_check.ui
 
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -77,7 +78,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                                 )
                         ) {
                             isLoading = true
-                            progressDismissDialog.startLoadingDialog()
                             if (lastKeyWord.isNotEmpty()) {
                                 loadMore(
                                     lastKeyWord,
@@ -89,7 +89,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 }
             })
         }
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         // Start a coroutine in the lifecycle scope
         lifecycleScope.launch {
             // repeatOnLifecycle launches the block in a new coroutine every time the
@@ -101,17 +104,20 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 flowSearchViewModel.uiState.collect { uiState ->
                     // New value received
                     when (uiState) {
+                        is LatestReposUiState.Loading -> {
+                            progressDismissDialog.startLoadingDialog()
+                        }
                         is LatestReposUiState.Success -> {
-                            adapter.submitList(uiState.repos)
+                            adapter.submitList(uiState.repos.toList())
                             isLoading = false
                             progressDismissDialog.dismissDialog()
                         }
-                        is LatestReposUiState.Error -> Toast.makeText(
-                            activity,
-                            "$uiState.exception",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        is LatestReposUiState.Error -> {
+                            isLoading = false
+                            progressDismissDialog.dismissDialog()
+                            Toast.makeText(activity, "$uiState.exception", Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
                 }
             }

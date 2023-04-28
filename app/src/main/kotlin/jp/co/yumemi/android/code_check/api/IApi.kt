@@ -13,10 +13,10 @@ interface IApi {
     suspend fun login(@Body body: RequestBody): Response<ResponseResult<Login>>
 
     @GET("search/repositories")
-    suspend fun search(@Query("q") key: String): SearchResult
+    suspend fun search(@Query("q") key: String): Response<SearchResult>
 
     @GET("search/repositories")
     @Headers("Accept: application/vnd.github.v3+json")
-    suspend fun doPageSearch(@Query("q") key: String, @Query("page") page: String): SearchResult
+    suspend fun doPageSearch(@Query("q") key: String, @Query("page") page: String): Response<SearchResult>
 
 }
