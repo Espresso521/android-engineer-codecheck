@@ -38,12 +38,12 @@ public class BankSettingActivity extends AppCompatActivity {
 
                     @Override
                     public void checkBoxItem1(boolean value) {
-                        showToast("gotoNextPhase");
+                        showToast("checkBoxItem1 value is " + value);
                     }
 
                     @Override
                     public void checkBoxItem2(boolean value) {
-                        showToast("gotoNextPhase");
+                        showToast("checkBoxItem2 value is " + value);
                     }
                 }),
                 "Pay");
@@ -64,7 +64,6 @@ public class BankSettingActivity extends AppCompatActivity {
 
     private void showToast(String content) {
         Toast.makeText(mContext, content, Toast.LENGTH_LONG).show();
-        finish();
     }
 
     public static class WebCallBack {
