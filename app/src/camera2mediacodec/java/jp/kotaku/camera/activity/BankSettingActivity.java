@@ -30,7 +30,22 @@ public class BankSettingActivity extends AppCompatActivity {
         webView.getSettings().setAllowFileAccessFromFileURLs(false);
         webView.getSettings().setAllowUniversalAccessFromFileURLs(false);
         webView.getSettings().setTextZoom(100);
-        webView.addJavascriptInterface(new WebCallBack(() -> showToast("Js call this callback interface!!")),
+        webView.addJavascriptInterface(new WebCallBack(new Callbacks() {
+                    @Override
+                    public void gotoNextPhase() {
+                        showToast("gotoNextPhase");
+                    }
+
+                    @Override
+                    public void checkBoxItem1(boolean value) {
+                        showToast("gotoNextPhase");
+                    }
+
+                    @Override
+                    public void checkBoxItem2(boolean value) {
+                        showToast("gotoNextPhase");
+                    }
+                }),
                 "Pay");
 //        webView.loadUrl("https://kotaku-blog.link/cancel.html");
         webView.loadUrl("file:///android_asset/news.html");
@@ -65,10 +80,26 @@ public class BankSettingActivity extends AppCompatActivity {
             if (callbacks != null)
                 callbacks.gotoNextPhase();
         }
+
+        @JavascriptInterface
+        public void checkBoxItem1(boolean value) {
+            if (callbacks != null)
+                callbacks.checkBoxItem1(value);
+        }
+
+        @JavascriptInterface
+        public void checkBoxItem2(boolean value) {
+            if (callbacks != null)
+                callbacks.checkBoxItem2(value);
+        }
     }
 
     interface Callbacks {
         void gotoNextPhase();
+
+        void checkBoxItem1(boolean value);
+
+        void checkBoxItem2(boolean value);
     }
 
     @Override
