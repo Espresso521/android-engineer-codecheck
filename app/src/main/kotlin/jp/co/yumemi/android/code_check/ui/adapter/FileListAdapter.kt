@@ -6,12 +6,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import dagger.hilt.android.scopes.ActivityRetainedScoped
 import jp.co.yumemi.android.code_check.data.Mp4FileMetadata
 import jp.co.yumemi.android.code_check.databinding.FileInfoViewBinding
 import javax.inject.Inject
 
-@ActivityRetainedScoped
 class FileListAdapter @Inject constructor(
     private val fragment: Activity,
 ) : ListAdapter<Mp4FileMetadata, RecyclerView.ViewHolder>(FileInfoDiffCB()) {

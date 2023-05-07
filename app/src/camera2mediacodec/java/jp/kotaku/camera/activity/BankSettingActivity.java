@@ -28,7 +28,8 @@ public class BankSettingActivity extends AppCompatActivity {
         webView.getSettings().setTextZoom(100);
         webView.addJavascriptInterface(new WebCallBack(() -> showToast("Js call this callback interface!!")),
                 "Pay");
-        webView.loadUrl("https://kotaku-blog.link/cancel.html");
+//        webView.loadUrl("https://kotaku-blog.link/cancel.html");
+        webView.loadUrl("file:///android_asset/news.html");
     }
 
     private void showToast(String content) {

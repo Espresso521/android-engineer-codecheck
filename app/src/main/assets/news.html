@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>kotaku-blog</title>
+  <style>
+    .titlebar {
+      width: 100%;
+      height: 48px;
+      display: flex;
+      background-color: rgb(255, 255, 255);
+    }
+
+    .titleName {
+      display: flex;
+      margin: 0 auto;
+      float: none;
+      width: 100%;
+      font-size: 18px;
+      color: grey;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .titleBtn {
+      display: flex;
+      float: left;
+      width: 32px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .horizontal-line {
+      border-bottom: 2px solid #b9b7b7;
+      margin-top: 15px;
+    }
+
+    .bold {
+      color: black;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+      font-weight: bold;
+    }
+
+    .fixed-button {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: #BF0000;
+      text-align: center;
+    }
+
+    .fixed-button button {
+      padding: 15px;
+      border: none;
+      width: 100%;
+      background-color: #BF0000;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<script>
+  function callAndroidFunction () {
+    Pay.gotoNextPhase()
+  }
+</script>
+
+<body>
+<!-- <div>这是Kotaku的域名空间，欢迎你的到来！</div>
+<div>请访问我的网站 <a href="https://www.kotaku-blog.com"><b>www.kotaku-blog.com</b></a></div> -->
+<div class="titlebar">
+  <div class="titleName" style="color: darkred;">
+    楽天ペイアプリ利用規約
+  </div>
+</div>
+
+<hr>
+
+<div style="margin-bottom: 20px; margin-top: 15px;">
+  下記リンクより内容をご確認の上、【全ての規約に同意して次へ】をタップしてください。
+</div>
+
+<div><a href=" https://pay.rakuten.co.jp/agreement/">楽天ペイ利用規約の表示</a></div>
+<div><a href="https://pointcard.rakuten.co.jp/guidance/restriction/">楽天ポイントカード利用規約の表示</a></div>
+<div><a href="https://cash.rakuten.co.jp/Guidance/GuidanceCashAgreement/">楽天キャッシュ利用規約の表示</a></div>
+<div>
+  <p style="font-size: 10px; color: grey">※楽天キャッシュの一部残高は現在、出金機能を停止しています。</p>
+</div>
+
+<div><a href="https://edy.rakuten.co.jp/app/terms/rpay_edy/">楽天Edyの利用規約の表示</a></div>
+<div><a href="https://pay.rakuten.co.jp/static/redirect/app_edy_terms.html">楽天Edyオンラインサービス利用約款の表示</a></div>
+
+<div class="horizontal-line"></div>
+
+<div class="titleName" style="margin-top: 21px;">
+  <p class="blod">
+    メールマガジン
+  </p>
+</div>
+
+<div style="margin-top: 21px; color:#333333; margin-bottom: 10px;">キャンペーン情報や楽天グループまたはその他企業のお得な情報などを配信しています。</div>
+
+<label class="blod">
+  <input type="checkbox" checked>
+  <span class="checkmark"></span>
+  楽天ペイニュースの配信を希望する
+</label><br>
+
+<label class="blod">
+  <input type="checkbox" checked>
+  <span class="checkmark"></span>
+  楽天ポイントカードニュースの配信を希望する
+</label>
+
+<div style="text-align: left; justify-content: left; align-items: left;">
+  <p style="font-size: 10px; color: grey; white-space: pre-wrap; text-align: left;">
+    ※楽天会員情報にご登録されているメールアドレス宛にお送りします。
+    ※配信を希望されない場合は「配信を希望する」のチェックをはずしてください。
+    ※ニュースは登録後、個別に配信を停止する事ができます。
+  </p>
+</div>
+
+<div class="horizontal-line"></div>
+
+<div class="fixed-button">
+  <button onclick="callAndroidFunction()">全ての規約に同意して次へ</button>
+</div>
+
+</body>
+
+</html>

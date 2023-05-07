@@ -232,4 +232,33 @@ class ExampleUnitTest {
         }
     }
 
+    @Test
+    fun forTest() {
+        val a = maxProfit(intArrayOf(1,2,3,4))
+        println("huze max is $a")
+    }
+
+    fun maxProfit(prices: IntArray): Int {
+        var max = 0
+        var currentGap = 0
+        for(i in 1 until prices.size) {
+            currentGap += prices[i] - prices[i - 1]
+            if (currentGap < 0)
+                currentGap = 0
+            else if (currentGap > max)
+                max = currentGap
+        }
+        return max
+    }
+
+    fun runningSum(nums: IntArray): IntArray {
+        val ret = IntArray(nums.size)
+
+        for(i in nums.indices) {
+            ret[i] = nums.take(i+1).sum()
+        }
+
+        return ret
+    }
+
 }
