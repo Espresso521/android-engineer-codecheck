@@ -3,7 +3,9 @@ package jp.kotaku.camera.activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +16,14 @@ public class BankSettingActivity extends AppCompatActivity {
 
     private Context mContext;
 
+    private WebView webView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
         setContentView(R.layout.activity_bank_setting);
-        WebView webView = findViewById(R.id.bankWebView);
+        webView = findViewById(R.id.bankWebView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccess(false);
         webView.getSettings().setAllowContentAccess(false);
@@ -30,6 +34,17 @@ public class BankSettingActivity extends AppCompatActivity {
                 "Pay");
 //        webView.loadUrl("https://kotaku-blog.link/cancel.html");
         webView.loadUrl("file:///android_asset/news.html");
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request.getUrl().toString().contains("rakuten.co.jp")) {
+                    view.loadUrl(request.getUrl().toString());
+                    return true;
+                }
+
+                return super.shouldOverrideUrlLoading(view, request);
+            }
+        });
     }
 
     private void showToast(String content) {
@@ -46,13 +61,22 @@ public class BankSettingActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void gotoSetting() {
+        public void gotoNextPhase() {
             if (callbacks != null)
-                callbacks.gotoSetting();
+                callbacks.gotoNextPhase();
         }
     }
 
     interface Callbacks {
-        void gotoSetting();
+        void gotoNextPhase();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(webView != null && webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            finish();
+        }
     }
 }
