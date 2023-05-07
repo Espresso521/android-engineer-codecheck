@@ -47,23 +47,18 @@ public class BankSettingActivity extends AppCompatActivity {
                     }
                 }),
                 "Pay");
-//        webView.loadUrl("https://kotaku-blog.link/cancel.html");
-        webView.loadUrl("file:///android_asset/news.html");
+        webView.loadUrl("https://kotaku-blog.link/news.html");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if (request.getUrl().toString().contains("rakuten.co.jp")) {
-                    view.loadUrl(request.getUrl().toString());
-                    return true;
-                }
-
-                return super.shouldOverrideUrlLoading(view, request);
+                // redirect url deal
+                return false;
             }
         });
     }
 
     private void showToast(String content) {
-        Toast.makeText(mContext, content, Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, content, Toast.LENGTH_SHORT).show();
     }
 
     public static class WebCallBack {
