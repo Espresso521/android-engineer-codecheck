@@ -18,6 +18,8 @@ public class BankSettingActivity extends AppCompatActivity {
 
     private WebView webView;
 
+    private static boolean isEdy = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +49,12 @@ public class BankSettingActivity extends AppCompatActivity {
                     }
                 }),
                 "Pay");
-        webView.loadUrl("https://kotaku-blog.link/news.html");
+
+        if(isEdy) {
+            webView.loadUrl("https://kotaku-blog.link/news.html?edy=1");
+        } else {
+            webView.loadUrl("https://kotaku-blog.link/news.html");
+        }
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {

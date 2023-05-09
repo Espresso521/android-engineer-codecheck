@@ -61,6 +61,10 @@
       font-size: 16px;
       cursor: pointer;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -92,8 +96,9 @@
   <p style="font-size: 10px; color: grey">※楽天キャッシュの一部残高は現在、出金機能を停止しています。</p>
 </div>
 
-<div><a href="https://edy.rakuten.co.jp/app/terms/rpay_edy/">楽天Edyの利用規約の表示</a></div>
-<div><a href="https://pay.rakuten.co.jp/static/redirect/app_edy_terms.html">楽天Edyオンラインサービス利用約款の表示</a></div>
+<div id="edy" class="hidden"><a href="https://edy.rakuten.co.jp/app/terms/rpay_edy/">楽天Edyの利用規約の表示</a></div>
+<div id="edy1" class="hidden"><a
+        href="https://pay.rakuten.co.jp/static/redirect/app_edy_terms.html">楽天Edyオンラインサービス利用約款の表示</a></div>
 
 <div class="horizontal-line"></div>
 
@@ -130,6 +135,16 @@
 <div class="fixed-button">
   <button onclick="callAndroidFunction()">全ての規約に同意して次へ</button>
 </div>
+
+<script>
+    var urlParams = new URLSearchParams(window.location.search)
+    var edyOK = urlParams.get('edy')
+
+    if (edyOK) {
+      document.getElementById('edy').classList.remove('hidden')
+      document.getElementById('edy1').classList.remove('hidden')
+    }
+  </script>
 
 </body>
 
