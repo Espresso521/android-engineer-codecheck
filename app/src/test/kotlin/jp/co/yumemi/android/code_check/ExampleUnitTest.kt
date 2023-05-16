@@ -234,8 +234,80 @@ class ExampleUnitTest {
 
     @Test
     fun forTest() {
-        val a = maxProfit(intArrayOf(1,2,3,4))
-        println("huze max is $a")
+        //val a = maxProfit(intArrayOf(1,2,3,4))
+        //println("huze max is $a")
+
+//        for(i in 0 until 10) {
+//            println("i is $i fibonacci is ${fibonacci(i)}")
+//        }
+//
+//        for(i in 0 until 10) {
+//            println("i is $i fibonaccinew is ${fibonaccinew(i)}")
+//        }
+
+        val a = numDecodings("111111111111111111")
+    }
+
+    fun fibonacci(n: Int): Int {
+        return if (n <= 1) {
+            n
+        } else {
+            fibonacci(n - 1) + fibonacci(n - 2)
+        }
+    }
+
+    fun fibonaccinew(n: Int): Int {
+        return if (n <= 2) {
+            n
+        } else {
+            fibonacci(n - 1) + fibonacci(n - 2) + fibonacci(n - 3)
+        }
+    }
+
+    fun numDecodings(s: String): Int {
+        if (s.isEmpty() || s[0] == '0') {
+            return 0
+        }
+
+        val n = s.length
+        val dp = IntArray(n + 1)
+        dp[0] = 1
+        dp[1] = 1
+
+        for (i in 2..n) {
+            val oneDigit = s.substring(i - 1, i).toInt()
+            val twoDigits = s.substring(i - 2, i).toInt()
+
+            if (oneDigit in 1..9) {
+                dp[i] += dp[i - 1]
+            }
+
+            if (twoDigits in 10..26) {
+                dp[i] += dp[i - 2]
+            }
+        }
+
+        dp.forEachIndexed() { index, value ->
+            println("kotaku: dp[$index] is $value")
+        }
+
+        return dp[n]
+    }
+
+
+    fun subsets(nums: IntArray): List<List<Int>> {
+        val result = mutableListOf<List<Int>>()
+        backtrack(nums, 0, mutableListOf(), result)
+        return result
+    }
+
+    private fun backtrack(nums: IntArray, index: Int, currentSubset: MutableList<Int>, result: MutableList<List<Int>>) {
+        result.add(currentSubset.toList())
+        for (i in index until nums.size) {
+            currentSubset.add(nums[i])
+            backtrack(nums, i + 1, currentSubset, result)
+            currentSubset.removeAt(currentSubset.size - 1)
+        }
     }
 
     fun maxProfit(prices: IntArray): Int {
