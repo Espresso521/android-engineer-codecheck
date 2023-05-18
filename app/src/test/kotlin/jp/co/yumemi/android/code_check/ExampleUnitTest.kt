@@ -12,7 +12,172 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        val ret = integerBreak(10)
+        println("huze ret is $ret")
+    }
+
+    fun integerBreak(n: Int): Int {
+        val dp: Array<List<Int>> = arrayOf(
+            listOf(0, 0),
+            listOf(0, 1),
+            listOf(1, 1),
+            listOf(1, 2),
+            listOf(2, 2),
+            listOf(2, 3),
+            listOf(3, 3),
+            listOf(3, 2, 2),
+            listOf(3, 3, 2),
+            listOf(3, 3, 3),
+            listOf(3, 3, 2, 2),//10
+            listOf(3, 3, 3, 2),
+            listOf(3, 3, 3, 3),
+            listOf(3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 2),//20
+            listOf(3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3),//30
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),//40
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),//50
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),//60
+        )
+
+        dp[n].reduceIndexed {
+            index, acc, num ->
+                println("huze index is $index acc is $acc, num is $num")
+            acc*num
+        }
+
+        return dp[n].reduce { acc, num ->
+            println("huze acc is $acc, num is $num")
+            acc * num
+        }
+    }
+
+    fun integerBreak1(n: Int): Int {
+        val dp: Array<List<Int>> = arrayOf(
+            listOf(0, 0),
+            listOf(0, 1),
+            listOf(1, 1),
+            listOf(1, 2),
+            listOf(2, 2),
+            listOf(2, 3),
+            listOf(3, 3),
+            listOf(3, 2, 2),
+            listOf(3, 3, 2),
+            listOf(3, 3, 3),
+            listOf(3, 3, 2, 2),//10
+            listOf(3, 3, 3, 2),
+            listOf(3, 3, 3, 3),
+            listOf(3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 2),//20
+            listOf(3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3),//30
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),//40
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),//50
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2),
+            listOf(3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),//60
+        )
+
+        if(n == 2) return 1
+        if(n == 3) return 2
+
+        return if(n % 3 == 0) {
+            myPow(3, n/3)
+        } else if(n%3 ==1){
+            myPow(3, (n/3)-1) * 4
+        } else {
+            myPow(3, n/3) * 2
+        }
+
+    }
+
+    private fun myPow(e: Int, x: Int): Int {
+        var ret = 1
+        for(i in 0 until x) {
+            ret *= e
+        }
+        println("myPow ret is $ret")
+        return ret
     }
 
     @Test
@@ -234,19 +399,63 @@ class ExampleUnitTest {
 
     @Test
     fun forTest() {
-        //val a = maxProfit(intArrayOf(1,2,3,4))
-        //println("huze max is $a")
-
-//        for(i in 0 until 10) {
-//            println("i is $i fibonacci is ${fibonacci(i)}")
-//        }
-//
-//        for(i in 0 until 10) {
-//            println("i is $i fibonaccinew is ${fibonaccinew(i)}")
-//        }
-
-        val a = numDecodings("111111111111111111")
+//        val max = lengthOfLIS(intArrayOf(1,3,6,7,9,4,10,5,6))
+        val max = minDistance("leetcode", "etco")
+        println("huze: max is $max")
     }
+
+    fun minDistance(word1: String, word2: String): Int {
+        val m = word1.length
+        val n = word2.length
+        val dp = Array(m + 1) { IntArray(n + 1) }
+
+        // Base cases
+        for (i in 0..m) {
+            dp[i][0] = i
+        }
+        for (j in 0..n) {
+            dp[0][j] = j
+        }
+
+        // Fill the dp table
+        for (i in 1..m) {
+            for (j in 1..n) {
+                if (word1[i - 1] == word2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1]
+                } else {
+                    dp[i][j] = minOf(dp[i - 1][j] + 1, dp[i][j - 1] + 1)
+                }
+            }
+        }
+
+        dp.forEachIndexed{ i, v1->
+            v1.forEachIndexed { j, v->
+                print("kotaku: dp[$i][$j] is $v ; ")
+            }
+            println()
+        }
+
+        return dp[m][n]
+    }
+
+    fun lengthOfLIS(nums: IntArray): Int {
+        val dp = IntArray(nums.size) { 1 } // 初始化 dp 数组，每个元素默认为 1
+
+        for (i in 1 until nums.size) {
+            for (j in 0 until i) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = maxOf(dp[i], dp[j] + 1)
+                }
+            }
+        }
+
+        dp.forEachIndexed{ index, v->
+            println("kotaku: dp[$index] is $v")
+        }
+
+        return dp[nums.size -1]
+    }
+
 
     fun fibonacci(n: Int): Int {
         return if (n <= 1) {
