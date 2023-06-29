@@ -1,0 +1,21 @@
+Hello everyone, my name is こ　たく. I come from China.
+I am an experienced Android engineer with expertise in building robust and scalable applications.
+Over the years, I have developed a deep understanding of the Android platform and its ecosystem.
+
+I have a strong command of Java and Kotlin programming languages,
+and I am proficient in using various Android development tools such as Android Studio, Gradle, and Git.
+I have a solid understanding of software design principles, clean architecture, and best practices for developing maintainable code.
+
+Throughout my career, I've consistently delivered high-quality Android applications that not only meet user requirements but also provide a delightful user experience.
+I am skilled in implementing responsive UI designs, integrating RESTful APIs, and optimizing app performance.
+
+The last job title I did in China was Technical Manager, where I was deeply involved from building the development team to releasing the application.
+So, collaboration and teamwork are central to my work philosophy.
+
+I passed the AWS SAA certification exam, and I also passed the JLPT N1 exam.
+Continuous learning is a core value of mine. I stay up-to-date with the latest trends and technologies in the Android development community.
+
+I am excited about the opportunity to contribute my skills and experience to a dynamic and forward-thinking project.
+I believe my passion for Android development, combined with my technical expertise, makes me an ideal candidate for the role of an Android Senior Engineer.
+
+Thank you.
