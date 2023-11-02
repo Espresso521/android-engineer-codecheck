@@ -1,11 +1,11 @@
 package jp.co.yumemi.android.code_check.viewmodel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.api.HttpRequestState
 import jp.co.yumemi.android.code_check.api.IApi
-import jp.co.yumemi.android.code_check.api.IApiImpl
 import jp.co.yumemi.android.code_check.api.apiFlow
 import jp.co.yumemi.android.code_check.data.model.Login
 import jp.co.yumemi.android.code_check.data.model.ResponseResult
@@ -24,10 +24,13 @@ class LoginViewModel @Inject constructor(
 ) :
     ViewModel() {
 
+    val nameText = MutableLiveData<String>()
+    val passwordText = MutableLiveData<String>()
+
     private val _loginResponse = MutableStateFlow<HttpRequestState<ResponseResult<Login>>>(HttpRequestState.Proceeding)
     val loginResponse: StateFlow<HttpRequestState<ResponseResult<Login>>> = _loginResponse
 
-    fun login(username: String, password: String) =
+    private fun login(username: String, password: String) =
         viewModelScope.launch(ioDispatcher) {
             apiFlow {
                 val requestBody = MultipartBody.Builder().apply {
@@ -40,4 +43,12 @@ class LoginViewModel @Inject constructor(
                 _loginResponse.value = it
             }
         }
+
+    fun onLogin() {
+        nameText.value?.let { name ->
+            passwordText.value?.let { password ->
+                login(name, password)
+            }
+        }
+    }
 }

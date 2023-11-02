@@ -14,6 +14,7 @@ import jp.co.yumemi.android.code_check.api.HttpRequestState
 import jp.co.yumemi.android.code_check.databinding.ActivityLoginBinding
 import jp.co.yumemi.android.code_check.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 @AndroidEntryPoint
 open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
@@ -29,14 +30,8 @@ open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding.viewModel = loginViewModel
         setContentView(binding.root)
-
-        binding.loginButton.setOnClickListener {
-            loginViewModel.login(
-                binding.nameEditText.text.toString(),
-                binding.passwordEditText.text.toString()
-            )
-        }
 
         // Start a coroutine in the lifecycle scope
         lifecycleScope.launch {
