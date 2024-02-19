@@ -14,6 +14,7 @@ import jp.co.yumemi.android.code_check.api.HttpRequestState
 import jp.co.yumemi.android.code_check.databinding.ActivityLoginBinding
 import jp.co.yumemi.android.code_check.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
+import java.io.IOException
 import kotlin.math.log
 
 @AndroidEntryPoint
@@ -58,6 +59,16 @@ open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
                     }
                 }
             }
+        }
+
+        val lottieAnimationView = binding.lottieAnimationView
+        try {
+            val inputStream = assets.open("lottie/lottie_chicken.json")
+            val animationJson = inputStream.bufferedReader().use { it.readText() }
+            lottieAnimationView.setAnimationFromJson(animationJson)
+        } catch (e: IOException) {
+            // 处理读取文件时的异常
+            e.printStackTrace()
         }
     }
 
