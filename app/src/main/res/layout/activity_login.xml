@@ -23,17 +23,26 @@
 <!--            app:layout_constraintBottom_toTopOf="@+id/horizontalGuid"-->
 <!--            android:src="@mipmap/github_icon" />-->
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/lottieAnimationView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+<!--        <com.airbnb.lottie.LottieAnimationView-->
+<!--            android:id="@+id/lottieAnimationView"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="56dp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/horizontalGuid"-->
+<!--            app:lottie_autoPlay="true"-->
+<!--            app:lottie_loop="true" />-->
+
+        <app.rive.runtime.kotlin.RiveAnimationView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/horizontalGuid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/horizontalGuid"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true" />
+            app:riveResource="@raw/login_screen_character" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/horizontalGuid"

@@ -60,16 +60,6 @@ open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
                 }
             }
         }
-
-        val lottieAnimationView = binding.lottieAnimationView
-        try {
-            val inputStream = assets.open("lottie/lottie_chicken.json")
-            val animationJson = inputStream.bufferedReader().use { it.readText() }
-            lottieAnimationView.setAnimationFromJson(animationJson)
-        } catch (e: IOException) {
-            // 处理读取文件时的异常
-            e.printStackTrace()
-        }
     }
 
     protected open fun onLoginSuccess() {
