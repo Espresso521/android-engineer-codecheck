@@ -36,13 +36,15 @@
 <!--            app:lottie_loop="true" />-->
 
         <app.rive.runtime.kotlin.RiveAnimationView
+            android:id="@+id/loginAnimationView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/horizontalGuid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:riveResource="@raw/login_screen_character" />
+            app:riveResource="@raw/login_screen_character"
+            app:riveStateMachine="LoginStateMachine"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/horizontalGuid"
@@ -55,7 +57,7 @@
             android:id="@+id/nameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="UserName"
+            android:hint="@string/username"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/horizontalGuid">
@@ -78,7 +80,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nameLayout"
             android:layout_marginTop="16dp"
-            android:hint="Password">
+            android:hint="@string/password">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordEditText"
@@ -94,8 +96,7 @@
             android:id="@+id/loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="LOG IN"
-            android:onClick="@{() -> viewModel.onLogin()}"
+            android:text="@string/log_in"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/passwordLayout"

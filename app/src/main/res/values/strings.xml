@@ -4,4 +4,7 @@
     <string name="written_language">Written in %s</string>
     <string name="created_time">Created at %s</string>
     <string name="take_photo">Take Photo</string>
+    <string name="username">UserName</string>
+    <string name="password">Password</string>
+    <string name="log_in">LOG IN</string>
 </resources>
