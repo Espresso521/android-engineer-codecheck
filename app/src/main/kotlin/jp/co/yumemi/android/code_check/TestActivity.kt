@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.ActivityTestBinding
+import jp.co.yumemi.android.code_check.ui.FibonacciFanChartView
 import jp.co.yumemi.android.code_check.ui.FibonacciHorizontalLinesView
 import jp.co.yumemi.android.code_check.ui.RectangleChartView
 
@@ -26,7 +27,7 @@ class TestActivity : AppCompatActivity(R.layout.activity_test) {
 
         // 创建自定义的 CustomShapeView
         //val customShapeView = TriangleChartLineView(this, null, Color.BLUE)
-        val customShapeView = FibonacciHorizontalLinesView(this, null, Color.BLUE)
+        val customShapeView = FibonacciFanChartView(this, null, Color.BLUE)
         binding.selfView.addView(customShapeView)
 
         // 按钮点击事件，改变颜色
