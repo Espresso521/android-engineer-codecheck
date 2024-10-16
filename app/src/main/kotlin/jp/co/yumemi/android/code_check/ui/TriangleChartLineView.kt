@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Path
 import android.util.AttributeSet
 
-class TriangleChartView @JvmOverloads constructor(
+class TriangleChartLineView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     lineColor: Int

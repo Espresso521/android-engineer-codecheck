@@ -56,7 +56,7 @@ abstract class ChartLinePreviewBase @JvmOverloads constructor(
         }
     }
 
-    fun changeColor(newColor: Int) {
+    open fun changeColor(newColor: Int) {
         linePaint.color = newColor
         invalidate()
     }
