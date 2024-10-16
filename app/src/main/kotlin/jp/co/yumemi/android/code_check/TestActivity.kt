@@ -8,10 +8,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.ActivityTestBinding
-import jp.co.yumemi.android.code_check.ui.HorizontalLineChartLineView
-import jp.co.yumemi.android.code_check.ui.ParallelLineChartView
-import jp.co.yumemi.android.code_check.ui.TriangleChartLineView
-import jp.co.yumemi.android.code_check.ui.VerticalLineChartLineView
+import jp.co.yumemi.android.code_check.ui.RectangleChartView
 
 @AndroidEntryPoint
 class TestActivity : AppCompatActivity(R.layout.activity_test) {
@@ -28,7 +25,7 @@ class TestActivity : AppCompatActivity(R.layout.activity_test) {
 
         // 创建自定义的 CustomShapeView
         //val customShapeView = TriangleChartLineView(this, null, Color.BLUE)
-        val customShapeView = ParallelLineChartView(this, null, Color.BLUE)
+        val customShapeView = RectangleChartView(this, null, Color.BLUE)
         binding.selfView.addView(customShapeView)
 
         // 按钮点击事件，改变颜色
