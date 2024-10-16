@@ -1,9 +1,10 @@
-package jp.co.yumemi.android.code_check.ui
+package jp.co.yumemi.android.code_check.ui.chartlineview
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Path
 import android.util.AttributeSet
+import jp.co.yumemi.android.code_check.ui.ChartLinePreviewBase
 
 class TriangleChartLineView @JvmOverloads constructor(
     context: Context,
