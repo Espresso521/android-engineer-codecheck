@@ -74,6 +74,11 @@ open class LoginActivity : AppCompatActivity(R.layout.activity_login) {
             loginAV.postDelayed(Runnable { loginViewModel.onLogin() }, 2000)
         }
 
+        binding.testButton.setOnClickListener {
+            startActivity(Intent(this@LoginActivity, TestActivity::class.java))
+            finish()
+        }
+
         binding.nameEditText.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 //do nothing
