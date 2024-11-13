@@ -33,5 +33,7 @@ class TestActivity : AppCompatActivity(R.layout.activity_test) {
         binding.changeColor.setOnClickListener {
             customShapeView.changeColor(Color.RED)  // 假设有一个方法可以改变颜色
         }
+
+        binding.mySeekbar.setOnSeekBarChangeListener()
     }
 }

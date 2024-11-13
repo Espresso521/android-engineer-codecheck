@@ -15,6 +15,7 @@
             android:background="@color/black"/>
 
         <jp.co.yumemi.android.code_check.ui.MySeekBar
+            android:id="@+id/mySeekbar"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_centerInParent="true"
